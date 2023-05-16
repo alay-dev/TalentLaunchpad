@@ -3,7 +3,7 @@ import UNIVERSAL from '../../config/config';
 import { Job } from '@/entity/jobs';
 
 type InitialState = {
-    data: any,
+    data: Job[],
     userJob: {
         data: [],
         error: string,
@@ -19,7 +19,7 @@ type InitialState = {
 }
 
 const initialState: InitialState = {
-    data: "",
+    data: [],
     userJob: {
         data: [],
         error: "",
@@ -52,6 +52,7 @@ type AddJobPayload = {
     jobTitle: string,
     description: string,
     jobType: string,
+    industry: string,
     qualificationRequired: string,
     experienceRequired: string,
     location: string,
@@ -93,6 +94,33 @@ export const getAllJobs = createAsyncThunk(
                 // "Authorization": `Bearer ${data.token}`
             },
             method: 'GET',
+        })
+            .then((response) => response.json())
+            .then((res) => {
+                // if (res.status !== "success") return rejectWithValue(res);
+                return res.data;
+            });
+    }
+);
+
+type GetJobsByFilterPayload = {
+    searchTerm: string,
+    location: string,
+    jobType: string[]
+}
+
+export const getJobsByFilter = createAsyncThunk(
+    '/job/getJobsByFilter',
+    (data: GetJobsByFilterPayload, { rejectWithValue }) => {
+        return fetch(`${UNIVERSAL.BASEURL}/api/jobs/get_filtered_jobs`, {
+            headers: {
+                "Content-Type": "application/json",
+                // "Authorization": `Bearer ${data.token}`
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                ...data
+            })
         })
             .then((response) => response.json())
             .then((res) => {
@@ -242,10 +270,10 @@ const jobSlice = createSlice({
         builder.addCase(addJobDetail.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(addJobDetail.fulfilled, (state, action) => {
-            state.loading = false;
-            state.data = action.payload;
-        });
+        // builder.addCase(addJobDetail.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     state.data = action.payload;
+        // });
         builder.addCase(addJobDetail.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message!;
@@ -265,11 +293,11 @@ const jobSlice = createSlice({
         builder.addCase(applyJob.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(applyJob.fulfilled, (state, action) => {
-            state.loading = false;
-            state.data = action.payload;
-            state.error = ""
-        });
+        // builder.addCase(applyJob.fulfilled, (state, action) => {
+        //     state.loading = false;
+        //     state.data = action.payload;
+        //     state.error = ""
+        // });
         builder.addCase(applyJob.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message!;
@@ -285,6 +313,18 @@ const jobSlice = createSlice({
         builder.addCase(getAppliedJobs.rejected, (state, action) => {
             state.appliedJobs.loading = false;
             state.appliedJobs.error = action.error.message!;
+        });
+        builder.addCase(getJobsByFilter.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getJobsByFilter.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = ""
+        });
+        builder.addCase(getJobsByFilter.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message!;
         });
     },
 });

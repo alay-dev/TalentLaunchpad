@@ -7,12 +7,13 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { addCompanyDetail, changeCompanyLogo, getUserCompany, updateCompanyDetail } from '@/slices/company/companySlice';
 import { useEffect } from 'react';
-import { Modal } from "@mui/material";
+import { Alert, AlertColor, Modal, Snackbar } from "@mui/material";
 import UNIVERSAL from "@/config/config";
 
 const CompanyProfile = () => {
     const [changeLogoModal, setChangeLogoModal] = useState(false)
     const [logoTmp, setLogoTmp] = useState<any>(null)
+    const [updateCompanyMessage, setUpdateCompanyMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
 
     const user = useAppSelector(state => state.user)
     const auth = useAppSelector(state => state.authentication.data)
@@ -27,9 +28,13 @@ const CompanyProfile = () => {
                 ...data,
                 token: auth.token
             })).unwrap()
-                .then(() => dispatch(getUserCompany({
-                    token: auth.token
-                })))
+                .then(() => {
+                    dispatch(getUserCompany({
+                        token: auth.token
+                    }));
+                    setUpdateCompanyMessage({ severity: "success", message: "Company detail updated" })
+                })
+                .catch(err => setUpdateCompanyMessage({ severity: "error", message: err.message }))
         } else {
             dispatch(addCompanyDetail({
                 ...data,
@@ -59,8 +64,8 @@ const CompanyProfile = () => {
                 googlePlusLink: company.data.google_plus_link,
                 linkedinLink: company.data.linkedin_link,
                 twitterLink: company.data.twitter_link,
-                country: company.data.location.split(",")[1],
-                city: company.data.location.split(",")[0],
+                country: company.data.location?.split(", ")[1],
+                city: company.data.location?.split(", ")[0],
                 completeAddress: company.data.complete_address,
                 primaryIndustry: company.data.primary_industry
             })
@@ -77,8 +82,20 @@ const CompanyProfile = () => {
     const handle_upload_logo = () => {
         dispatch(changeCompanyLogo({ token: auth.token, logo: logoTmp }))
             .unwrap()
-            .then(() => { dispatch(getUserCompany({ token: auth.token })); setChangeLogoModal(false) })
+            .then(() => {
+                dispatch(getUserCompany({ token: auth.token }));
+                setChangeLogoModal(false);
+                setUpdateCompanyMessage({ severity: "success", message: "Logo changed successfully" })
+            })
     }
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setUpdateCompanyMessage({ severity: "", message: "" });
+    };
 
     return (
         <DashboardLayout>
@@ -194,6 +211,11 @@ const CompanyProfile = () => {
                     </div>
                 </div>
             </Modal>
+            <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} open={Boolean(updateCompanyMessage.message)} autoHideDuration={6000} onClose={handleClose}>
+                <Alert variant='filled' severity={updateCompanyMessage.severity as AlertColor} onClose={handleClose} sx={{ width: '100%' }}>
+                    {updateCompanyMessage.message}
+                </Alert>
+            </Snackbar>
         </DashboardLayout>
     )
 }

@@ -13,6 +13,8 @@ import { useAppSelector } from '@/hooks/useAppSelector'
 import { deleteJob, getUserJobs } from '@/slices/job/jobSlice'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { getUserCompany } from '@/slices/company/companySlice'
+import UNIVERSAL from '@/config/config'
 
 const ManageJob = () => {
     const [applicantModal, setApplicantModal] = useState<any>(false)
@@ -20,6 +22,7 @@ const ManageJob = () => {
     const [jobList, setJobList] = useState<string[]>([]);
     const auth = useAppSelector(state => state.authentication.data);
     const jobs = useAppSelector(state => state.job.userJob);
+    const company = useAppSelector(state => state.company)
 
 
     const dispatch = useAppDispatch()
@@ -29,6 +32,7 @@ const ManageJob = () => {
     useEffect(() => {
         if (auth?.token) {
             dispatch(getUserJobs({ token: auth.token }))
+            dispatch(getUserCompany({ token: auth.token }))
         }
     }, [auth.token])
 
@@ -73,7 +77,7 @@ const ManageJob = () => {
                             {jobList.map((item: string, i) => {
                                 return <tr key={item}>
                                     <td className='py-4 px-2 flex gap-4 items-start' >
-                                        <Image alt="company logo" width={50} height={50} src="https://superio-next.vercel.app/images/resource/company-logo/1-1.png" />
+                                        <Image alt="company logo" width={50} height={50} src={`${UNIVERSAL.BASEURL}/company/${company.userCompany.data.company_logo}`} />
                                         <div>
                                             <h3 className='font-medium text-lg' >{item}</h3>
                                             <div className='flex gap-4 items-center '>
@@ -88,7 +92,7 @@ const ManageJob = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td onClick={() => setApplicantModal(jobs.data[item])} className='py-4 px-2 text-center text-blue-600 underline cursor-pointer'>{jobs.data[item].length} application</td>
+                                    <td onClick={() => setApplicantModal(jobs.data[item])} className='py-4 px-2 text-center text-blue-600 underline cursor-pointer'>{jobs.data[item][0].applied_at ? jobs.data[item].length : "0"} application</td>
                                     <td className='py-4 px-2 text-center '>{moment(jobs.data[item][0].created_at).format("LL")}</td>
                                     <td className='py-4 px-2 text-center'>Active</td>
                                     <td className='py-4 px-2 flex justify-center'>
@@ -113,22 +117,25 @@ const ManageJob = () => {
             <Modal open={applicantModal} onClose={() => setApplicantModal(false)}  >
                 <div className=" w-4/12 flex flex-col bg-white p-8 rounded-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 outline-none " >
                     <h3 className="font-semibold text-lg mb-4"  >All applicants</h3>
-                    <ul className='flex flex-col gap-4 max-h-[20rem] overflow-auto ' >
-                        {applicantModal && applicantModal?.map(item => {
-                            return <li className='flex gap-2'>
-                                <div className='w-12  relative' >
-                                    <Image alt="avatar" className="object-cover rounded-full " fill src={"/assets/avatar.png"} />
-                                </div>
-                                <div>
-                                    <Link href={`/user/${item.user_id}`}>
-                                        <h3 className='text-blue-700 cursor-pointer hover:underline font-medium'  >{item.user_name}</h3>
-                                    </Link>
+                    {!applicantModal[0]?.applied_at && <p>No applications yet</p>}
+                    {applicantModal[0]?.applied_at &&
+                        <ul className='flex flex-col gap-4 max-h-[20rem] overflow-auto ' >
+                            {applicantModal && applicantModal?.map(item => {
+                                return <li className='flex gap-2'>
+                                    <div className='w-12  relative' >
+                                        <Image alt="avatar" className="object-cover rounded-full " fill src={"/assets/avatar.png"} />
+                                    </div>
+                                    <div>
+                                        <Link href={`/user/${item.user_id}`}>
+                                            <h3 className='text-blue-700 cursor-pointer hover:underline font-medium'  >{item.user_name}</h3>
+                                        </Link>
 
-                                    <p className='text-gray-500' >{moment(item.applied_at).format("DD MMM YYYY")}</p>
-                                </div>
-                            </li>
-                        })}
-                    </ul>
+                                        <p className='text-gray-500' >{moment(item.applied_at).format("DD MMM YYYY")}</p>
+                                    </div>
+                                </li>
+                            })}
+                        </ul>
+                    }
                 </div>
             </Modal>
             <Modal open={deleteModal} onClose={() => setDeleteModal(false)} >

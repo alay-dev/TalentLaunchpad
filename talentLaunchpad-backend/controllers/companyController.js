@@ -224,6 +224,16 @@ exports.changeCompanyLogo = catchAsync(async (req, res, next) => {
     return new AppError("Failed to change company logo. Try again.", 400);
   }
 
+  const { rows: companyRow } = await pool.query(
+    `SELECT * FROM company WHERE user_id = ${user_id}`
+  );
+
+  if (!companyRow?.length) {
+    await pool.query(
+      `INSERT INTO company(user_id) VALUES(${user_id}) RETURNING *`
+    );
+  }
+
   const { rows: updatedCompanyRows } = await pool.query(
     `UPDATE  company
     SET company_logo = '${req.file.filename}',  

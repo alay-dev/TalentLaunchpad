@@ -7,6 +7,7 @@ export type User = {
     email: string,
     phone: string,
     company_id: number,
+    resume: string,
     status: "active" | "deactivated",
     user_type: "candidate" | "employer",
     name: string,

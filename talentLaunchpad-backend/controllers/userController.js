@@ -40,6 +40,24 @@ exports.getProfile = catchAsync(async (req, res, next) => {
     };
   }
 
+  const { rows: resumeRows } = await pool.query(
+    `SELECT * FROM resume WHERE user_id = ${user.id} ;`
+  );
+
+  if (resumeRows.length) {
+    user = {
+      ...user,
+      resume: resumeRows[0].resume_link,
+    };
+  } else {
+    user = {
+      ...user,
+      resume: "",
+    };
+  }
+
+  console.log(user, "USER");
+
   res.status(201).json({
     status: "success",
     data: {
@@ -107,13 +125,33 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
+  const user_id = req.params.id;
+
   const { rows: userRows } = await pool.query(
-    `SELECT * FROM users WHERE id = ${req.params.id} ;`
+    `SELECT * FROM users WHERE id = ${user_id} ;`
   );
+
+  let user = userRows[0];
+
+  const { rows: resumeRows } = await pool.query(
+    `SELECT * FROM resume WHERE user_id = ${user.id} ;`
+  );
+
+  if (resumeRows.length) {
+    user = {
+      ...user,
+      resume: resumeRows[0].resume_link,
+    };
+  } else {
+    user = {
+      ...user,
+      resume: "",
+    };
+  }
 
   res.status(200).json({
     status: "success",
-    data: userRows[0],
+    data: user,
   });
 });
 

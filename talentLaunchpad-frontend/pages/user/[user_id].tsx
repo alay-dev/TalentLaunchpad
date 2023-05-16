@@ -22,6 +22,8 @@ import { Resume } from '@/entity/resume'
 
 const User = ({ user, resume }: Props) => {
 
+    console.log(user)
+
     return (
         <>
             <Header />
@@ -62,9 +64,9 @@ const User = ({ user, resume }: Props) => {
 
                     </div>
                     <div className='flex items-center gap-4' >
-                        {/* <a target='_blank' href={`${UNIVERSAL.BASEURL}/resume/${user?.}`}  > */}
-                        <button className="bg-blue-600 px-7  text-white rounded-md py-3  hover:shadow-lg transition duration-200 hover:bg-blue-600" >Download resume</button>
-                        {/* </a> */}
+                        <a target='_blank' href={`${UNIVERSAL.BASEURL}/resume/${user?.resume}`}  >
+                            <button className="bg-blue-600 px-7  text-white rounded-md py-3  hover:shadow-lg transition duration-200 hover:bg-blue-600" >Download resume</button>
+                        </a>
                         <button className='bg-gray-50 hover:shadow-lg transition-all duration-200  p-4 rounded-md ' >
                             <BsBookmark className='text-blue-500' />
                         </button>

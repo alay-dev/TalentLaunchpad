@@ -13,6 +13,7 @@ import { Job } from '@/entity/jobs';
 const EditJob = (props: Props) => {
     const [skills, setSkills] = useState<string[]>([]);
     const [skillTmp, setSkillTmp] = useState("");
+    const [entertingSkills, setEnterSkills] = useState(false)
 
     const router = useRouter()
 
@@ -43,6 +44,7 @@ const EditJob = (props: Props) => {
     }
 
     const handle_edit_job = (data: UpdateJobFormData) => {
+        if (entertingSkills) return;
         dispatch(updateJobDetail({
             ...data,
             skillsRequired: skills.toString(),
@@ -146,6 +148,7 @@ const EditJob = (props: Props) => {
                                 </div>
                                 <div className=" mt-5 flex flex-col w-full">
                                     <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" id="skillInput" placeholder="Enter to add skill"
+                                        onFocus={() => setEnterSkills(true)} onBlur={() => setEnterSkills(false)}
                                         value={skillTmp}
                                         onChange={(e) => setSkillTmp(e.target.value)}
                                         onKeyDown={(e) => handle_skills(e)}

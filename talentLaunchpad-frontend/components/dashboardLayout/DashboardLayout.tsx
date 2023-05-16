@@ -118,10 +118,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                             </li>
                         </Link>
 
-                        <li onClick={() => setActivePage("changePassword")} className={` hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >
+                        {/* <li onClick={() => setActivePage("changePassword")} className={` hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >
                             <RiLogoutCircleRLine className="text-xl" />
                             <p>Logout</p>
-                        </li>
+                        </li> */}
 
                     </ul>
                 </div>

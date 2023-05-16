@@ -162,8 +162,8 @@ exports.getUserJob = catchAsync(async (req, res, next) => {
   const { rows: jobRows } = await pool.query(
     `SELECT job_title, jobs.industry AS job_industry, jobs.location AS job_location, jobs.created_at AS job_created_at, jobs.id AS job_id, users.id AS user_id, users.name AS user_name, applied_at
     FROM jobs
-    JOIN jobs_applied ON jobs_applied.job_id = jobs.id
-    JOIN users ON jobs_applied.user_id = users.id
+    FULL JOIN jobs_applied ON jobs_applied.job_id = jobs.id
+    FULL JOIN users ON jobs_applied.user_id = users.id
     WHERE jobs.user_id = ${user_id};`
   );
 
@@ -227,7 +227,7 @@ exports.getAppliedJobs = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
   const { rows: jobRows } = await pool.query(
-    `SELECT job_title, applied_at, status, message, resume, industry as job_industry, location
+    `SELECT *
     FROM jobs_applied
     JOIN jobs ON jobs_applied.job_id = jobs.id
     WHERE jobs_applied.user_id = ${user_id};`
@@ -236,5 +236,60 @@ exports.getAppliedJobs = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: jobRows,
+  });
+});
+
+exports.getJobsByFilter = catchAsync(async (req, res, next) => {
+  const { searchTerm, location, jobType } = req.body;
+
+  let jobs;
+
+  let jobTypeArray = jobType.map((item) => {
+    return `'%${item}%'`;
+  });
+
+  jobTypeArray = jobTypeArray.toString();
+
+  if (searchTerm && jobType.length) {
+    const { rows: jobRows } = await pool.query(
+      `SELECT *
+    FROM jobs
+    WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
+    AND job_type LIKE ANY(ARRAY[${jobTypeArray}])
+    `
+    );
+
+    jobs = jobRows;
+  } else if (searchTerm && !jobType.length) {
+    const { rows: jobRows } = await pool.query(
+      `SELECT *
+    FROM jobs
+    WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
+    `
+    );
+
+    jobs = jobRows;
+  } else if (!searchTerm && jobType.length) {
+    const { rows: jobRows } = await pool.query(
+      `SELECT *
+    FROM jobs
+    WHERE job_type LIKE ANY(ARRAY[${jobTypeArray}])
+    `
+    );
+
+    jobs = jobRows;
+  } else if (!searchTerm && !jobType.length) {
+    const { rows: jobRows } = await pool.query(
+      `SELECT *
+    FROM jobs
+    `
+    );
+
+    jobs = jobRows;
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: jobs,
   });
 });

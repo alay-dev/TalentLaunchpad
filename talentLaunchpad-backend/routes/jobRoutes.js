@@ -31,4 +31,6 @@ router.post("/apply_job", authController.protect, jobsController.applyJob);
 
 router.post("/", authController.protect, jobsController.createJob);
 
+router.post("/get_filtered_jobs", jobsController.getJobsByFilter);
+
 module.exports = router;

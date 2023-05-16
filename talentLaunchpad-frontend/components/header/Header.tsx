@@ -1,6 +1,6 @@
 import { Alert, Avatar, Checkbox, Drawer, IconButton, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
-import { RiFacebookFill } from "react-icons/ri"
+import { RiFacebookFill, RiLogoutCircleRLine } from "react-icons/ri"
 import { CgGoogle } from "react-icons/cg"
 import { AiOutlineUser } from "react-icons/ai"
 import { FaUserTie } from "react-icons/fa"
@@ -104,7 +104,8 @@ const Header = () => {
                                 </Link>
                                 <Tooltip arrow title="logout">
                                     <li className=" flex gap-2 items-center transition-all duration-75 py-2 px-3 rounded-md hover:bg-slate-200 cursor-pointer" onClick={() => handle_logout()}>
-                                        <IoLogOutOutline className="text-xl" />
+                                        <RiLogoutCircleRLine className="text-xl" />
+                                        <p>Logout</p>
                                     </li>
                                 </Tooltip>
                             </>

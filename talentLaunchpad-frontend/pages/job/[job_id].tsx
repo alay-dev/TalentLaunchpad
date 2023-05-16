@@ -160,7 +160,7 @@ const JobDetail = ({ job, company }: Props) => {
                             {/* Company details starts */}
                             <div className='p-6 bg-gray-100 rounded-md shadow-sm flex-1 '>
                                 <div className='flex gap-4 items-start'>
-                                    <Image alt="company logo" width={60} height={60} src="https://superio-next.vercel.app/images/resource/company-logo/1-1.png" />
+                                    <Image className='rounded-md' alt="company logo" width={60} height={60} src={`${UNIVERSAL.BASEURL}/company/${company?.company_logo}`} />
                                     <div>
                                         <h3 className='font-medium text-lg'>{company.company_name}</h3>
                                         <Link className='text-blue-500 ' href="/company/2">View company profile</Link>
