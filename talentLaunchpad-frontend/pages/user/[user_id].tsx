@@ -30,7 +30,7 @@ const User = ({ user, resume }: Props) => {
             <div className="min-h-screen pt-[var(--header-height)] ">
                 <div className='bg-gradient-to-br from-violet-50 from-50% to-blue-300 px-10 py-20 flex items-center justify-between shadow-sm' >
                     <div className='  flex items-start justify-between gap-6'>
-                        <Image className='rounded-lg' alt="company logo" width={100} height={100} src={`${UNIVERSAL.BASEURL}/profilePic/${user?.avatar}`} />
+                        <Image className='rounded-lg' alt="company logo" width={100} height={100} src={user?.avatar ? `${UNIVERSAL.BASEURL}/profilePic/${user?.avatar}` : "/assets/avatar.png"} />
                         <div >
                             <h1 className='text-2xl font-medium mb-3 ' >{user?.name}</h1>
                             <div className='flex items-center gap-6'>
@@ -43,10 +43,11 @@ const User = ({ user, resume }: Props) => {
                                     <CiTimer />
                                     <p className='font-light' >{moment(user?.created_at).format("LL")}</p>
                                 </div>
-                                <div className='flex gap-2 items-center'>
-                                    <BsCashCoin />
-                                    <p className='font-light' >{user?.expected_salary}</p>
-                                </div>
+                                {user?.expected_salary &&
+                                    <div className='flex gap-2 items-center'>
+                                        <BsCashCoin />
+                                        <p className='font-light' >{user?.expected_salary}</p>
+                                    </div>}
 
                             </div>
                             {/* <div className='flex items-center gap-4 mt-3'>
@@ -64,9 +65,11 @@ const User = ({ user, resume }: Props) => {
 
                     </div>
                     <div className='flex items-center gap-4' >
-                        <a target='_blank' href={`${UNIVERSAL.BASEURL}/resume/${user?.resume}`}  >
-                            <button className="bg-blue-600 px-7  text-white rounded-md py-3  hover:shadow-lg transition duration-200 hover:bg-blue-600" >Download resume</button>
-                        </a>
+                        {user?.resume &&
+                            <a target='_blank' href={`${UNIVERSAL.BASEURL}/resume/${user?.resume}`}  >
+                                <button className="bg-blue-600 px-7  text-white rounded-md py-3  hover:shadow-lg transition duration-200 hover:bg-blue-600" >Download resume</button>
+                            </a>
+                        }
                         <button className='bg-gray-50 hover:shadow-lg transition-all duration-200  p-4 rounded-md ' >
                             <BsBookmark className='text-blue-500' />
                         </button>
@@ -75,79 +78,89 @@ const User = ({ user, resume }: Props) => {
                 <div className='py-16 px-14' >
                     <div className='flex gap-16' >
                         <div className='w-7/12' >
-                            <h3 className='font-medium text-xl mb-5'>About Me</h3>
-                            <p className='text-gray-500 leading-7' >{user?.bio}</p>
-                            <div className='mt-10' >
-                                <h3 className='font-medium text-xl mb-3'>Education</h3>
-                                {resume?.educations?.map(item => {
-                                    return <div className='mb-12'  >
-                                        <div className="flex gap-5 items-center mb-2">
-                                            <h3 className="font-medium text-xl" >{item.degree}</h3>
-                                            <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                            {user?.bio &&
+                                <>
+                                    <h3 className='font-medium text-xl mb-5'>About Me</h3>
+                                    <div className='[&>ul]:list-disc [&>ul]:ml-8 [&>ol]:text-gray-600 [&>ol]:list-decimal [&>ol]:ml-8 [&>ul]:text-gray-600 [&>h2]:text-3xl [&>h2]:font-bold [&>h3]:text-2xl [&>h3]:font-semibold [&>h4]:text-lg [&>h4]:font-medium [&>p]:text-gray-600' dangerouslySetInnerHTML={{ __html: user?.bio }} />
+                                </>
+                            }
+                            {resume?.educations?.length !== 0 &&
+                                <div className='mt-10' >
+                                    <h3 className='font-medium text-xl mb-3'>Education</h3>
+                                    {resume?.educations?.map(item => {
+                                        return <div className='mb-12' key={item.id} >
+                                            <div className="flex gap-5 items-center mb-2">
+                                                <h3 className="font-medium text-xl" >{item.degree}</h3>
+                                                <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                                            </div>
+
+                                            <h4 className="text-blue-500 mb-3" >{item.institute}</h4>
+                                            <p className="w-[80%] text-gray-400 " >{item.description}</p>
                                         </div>
+                                    })}
+                                </div>}
+                            {resume?.work_experience?.length !== 0 &&
+                                <div className='mt-10' >
+                                    <h3 className='font-medium text-xl mb-3'>Work Experience</h3>
+                                    {resume?.work_experience?.map(item => {
+                                        return <div className='mb-12' key={item.id}>
+                                            <div className="flex gap-5 items-center mb-2">
+                                                <h3 className="font-medium text-xl" >{item.job_title}</h3>
+                                                <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                                            </div>
 
-                                        <h4 className="text-blue-500 mb-3" >{item.institute}</h4>
-                                        <p className="w-[80%] text-gray-400 " >{item.description}</p>
-                                    </div>
-                                })}
-
-
-                            </div>
-                            <div className='mt-10' >
-                                <h3 className='font-medium text-xl mb-3'>Work Experience</h3>
-                                {resume?.work_experience?.map(item => {
-                                    return <div className='mb-12'  >
-                                        <div className="flex gap-5 items-center mb-2">
-                                            <h3 className="font-medium text-xl" >{item.job_title}</h3>
-                                            <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                                            <h4 className="text-blue-500 mb-3" >{item.company}</h4>
+                                            <p className="w-[80%] text-gray-400 " >{item.description}</p>
                                         </div>
-
-                                        <h4 className="text-blue-500 mb-3" >{item.company}</h4>
-                                        <p className="w-[80%] text-gray-400 " >{item.description}</p>
-                                    </div>
-                                })}
-                            </div>
-                            <div className='mt-10' >
-                                <h3 className='font-medium text-xl mb-3'>Projects</h3>
-                                {resume?.projects?.map(item => {
-                                    return <div className='mb-12'  >
-                                        <div className="flex gap-5 items-center mb-2">
-                                            <h3 className="font-medium text-xl" >{item.project_name}</h3>
-                                            <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                                    })}
+                                </div>
+                            }
+                            {resume?.projects?.length !== 0 &&
+                                <div className='mt-10' >
+                                    <h3 className='font-medium text-xl mb-3'>Projects</h3>
+                                    {resume?.projects?.map(item => {
+                                        return <div className='mb-12' key={item.id}  >
+                                            <div className="flex gap-5 items-center mb-2">
+                                                <h3 className="font-medium text-xl" >{item.project_name}</h3>
+                                                <p className="text-sm font-medium text-green-600 py-1 px-4 rounded-xl bg-gray-100" >{moment(item.start_date).format("LL")} - {moment(item.end_date).format("LL")}</p>
+                                            </div>
+                                            <p className="w-[80%] text-gray-400 " >{item.description}</p>
                                         </div>
-                                        <p className="w-[80%] text-gray-400 " >{item.description}</p>
-                                    </div>
-                                })}
+                                    })}
 
-                            </div>
+                                </div>
+                            }
                         </div>
                         <div className='w-5/12'>
                             {/* user details  starts*/}
                             <div className='mb-8 p-6 bg-gray-100 rounded-md shadow-sm flex-1 '>
                                 <h3 className='font-medium text-xl mb-5'>Overview</h3>
                                 <ul className='flex flex-col gap-6'>
-                                    <li className='flex gap-5 items-center '>
-                                        <IoBriefcaseOutline className='text-2xl text-blue-600' />
-                                        <div>
-                                            <h3 className='font-medium text-lg  ' >Experience</h3>
-                                            <p className='font-light' >{user?.experience}</p>
-                                        </div>
+                                    {user?.experience &&
+                                        <li className='flex gap-5 items-center '>
+                                            <IoBriefcaseOutline className='text-2xl text-blue-600' />
+                                            <div>
+                                                <h3 className='font-medium text-lg  ' >Experience</h3>
+                                                <p className='font-light' >{user?.experience}</p>
+                                            </div>
 
-                                    </li>
-                                    <li className='flex gap-5 items-center '>
-                                        <RxAvatar className='text-2xl text-blue-600' />
-                                        <div>
-                                            <h3 className='font-medium text-lg  ' >Age</h3>
-                                            <p className='font-light' >{user.age}</p>
-                                        </div>
-                                    </li>
-                                    <li className='flex gap-5 items-center '>
-                                        <BsGenderAmbiguous className='text-2xl text-blue-600' />
-                                        <div>
-                                            <h3 className='font-medium text-lg  ' >Gender</h3>
-                                            <p className='font-light' >Male</p>
-                                        </div>
-                                    </li>
+                                        </li>}
+                                    {user?.age &&
+                                        <li className='flex gap-5 items-center '>
+                                            <RxAvatar className='text-2xl text-blue-600' />
+                                            <div>
+                                                <h3 className='font-medium text-lg  ' >Age</h3>
+                                                <p className='font-light' >{user.age}</p>
+                                            </div>
+                                        </li>}
+                                    {user?.gender &&
+                                        <li className='flex gap-5 items-center '>
+                                            <BsGenderAmbiguous className='text-2xl text-blue-600' />
+                                            <div>
+                                                <h3 className='font-medium text-lg  ' >Gender</h3>
+                                                <p className='font-light' >Male</p>
+                                            </div>
+                                        </li>}
                                     <li className='flex gap-5 items-center '>
                                         <MdOutlineEmail className='text-2xl text-blue-600' />
                                         <div>
@@ -155,47 +168,56 @@ const User = ({ user, resume }: Props) => {
                                             <p className='font-light' >{user?.email}</p>
                                         </div>
                                     </li>
-                                    <li className='flex gap-5 items-center '>
-                                        <IoCallOutline className='text-2xl text-blue-600' />
-                                        <div>
-                                            <h3 className='font-medium text-lg  ' >Phone no.</h3>
-                                            <p className='font-light' >{user.phone}</p>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div className='mt-5'>
-                                    <h3 className='font-medium text-lg  ' >Skills</h3>
-                                    <div className='w-full flex gap-3 mt-2 flex-wrap'>
-                                        {resume?.skills?.split(",").map((item: any, i: number) => {
-                                            return <div key={i} className='bg-white rounded-sm py-2 px-5'>
-                                                <p>{item}</p>
+                                    {user?.phone &&
+                                        <li className='flex gap-5 items-center '>
+                                            <IoCallOutline className='text-2xl text-blue-600' />
+                                            <div>
+                                                <h3 className='font-medium text-lg  ' >Phone no.</h3>
+                                                <p className='font-light' >{user.phone}</p>
                                             </div>
-                                        })}
+                                        </li>
+                                    }
+                                </ul>
+                                {resume?.skills &&
+                                    <div className='mt-5'>
+                                        <h3 className='font-medium text-lg  ' >Skills</h3>
+                                        <div className='w-full flex gap-3 mt-2 flex-wrap'>
+                                            {resume?.skills?.split(",").map((item: any, i: number) => {
+                                                return <div key={i} className='bg-white rounded-sm py-2 px-5'>
+                                                    <p>{item}</p>
+                                                </div>
+                                            })}
 
-                                    </div>
-                                </div>
+                                        </div>
+                                    </div>}
                             </div>
                             {/* Job details ends */}
                             {/* Company details starts */}
-                            <div className='p-6 bg-gray-100 rounded-md shadow-sm flex-1 '>
-                                <div className='flex justify-between items-center' >
-                                    <h3 className='font-medium text-lg '>Social media</h3>
-                                    <div className='flex gap-3 items-center'>
-                                        <a target='_blank' href={user?.facebook_link}>
-                                            <RiFacebookFill className='text-xl text-gray-600' />
-                                        </a>
-                                        <a target='_blank' href={user?.twitter_link}>
-                                            <AiOutlineTwitter className='text-xl text-gray-600' />
-                                        </a>
-                                        <a target='_blank' href={user?.github_link}>
-                                            <AiFillGithub className='text-xl text-gray-600' />
-                                        </a>
-                                        <a target='_blank' href={user?.linkedin_link}>
-                                            <RiLinkedinFill className='text-xl text-gray-600' />
-                                        </a>
+                            {(user?.facebook_link || user?.github_link || user?.linkedin_link || user?.twitter_link) &&
+                                <div className='p-6 bg-gray-100 rounded-md shadow-sm flex-1 '>
+                                    <div className='flex justify-between items-center' >
+                                        <h3 className='font-medium text-lg '>Social media</h3>
+                                        <div className='flex gap-3 items-center'>
+                                            {user?.facebook_link &&
+                                                <a target='_blank' href={user?.facebook_link}>
+                                                    <RiFacebookFill className='text-xl text-gray-600' />
+                                                </a>}
+                                            {user?.twitter_link &&
+                                                <a target='_blank' href={user?.twitter_link}>
+                                                    <AiOutlineTwitter className='text-xl text-gray-600' />
+                                                </a>}
+                                            {user?.github_link &&
+                                                <a target='_blank' href={user?.github_link}>
+                                                    <AiFillGithub className='text-xl text-gray-600' />
+                                                </a>}
+                                            {user?.linkedin_link &&
+                                                <a target='_blank' href={user?.linkedin_link}>
+                                                    <RiLinkedinFill className='text-xl text-gray-600' />
+                                                </a>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div>}
                             {/* Company details ends */}
                         </div>
 

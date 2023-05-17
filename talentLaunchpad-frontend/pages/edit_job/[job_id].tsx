@@ -9,8 +9,11 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 import { updateJobDetail } from '@/slices/job/jobSlice';
 import { useRouter } from 'next/router';
 import { Job } from '@/entity/jobs';
+import dynamic from "next/dynamic";
+const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const EditJob = (props: Props) => {
+    const [jobDescription, setJobDescription] = useState("");
     const [skills, setSkills] = useState<string[]>([]);
     const [skillTmp, setSkillTmp] = useState("");
     const [entertingSkills, setEnterSkills] = useState(false)
@@ -49,6 +52,7 @@ const EditJob = (props: Props) => {
             ...data,
             skillsRequired: skills.toString(),
             jobId: props.job.id,
+            description: jobDescription,
             token: auth.token
         })).unwrap()
             .then(() => router.push("/manage_jobs"))
@@ -58,7 +62,6 @@ const EditJob = (props: Props) => {
         reset({
             jobTitle: props.job.job_title,
             applyLink: props.job.apply_link,
-            description: props.job.description,
             experienceRequired: props.job.experience_required,
             jobType: props.job.job_type,
             location: props.job.location,
@@ -88,7 +91,11 @@ const EditJob = (props: Props) => {
                         </div>
                         <div className="flex flex-col w-full mb-5">
                             <label className="mb-1 font-medium" htmlFor="jobDescription">Job Description</label>
-                            <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md"  {...register("description")} id="jobDescription" placeholder="Job Description" rows={10} />
+                            {/* <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md"  {...register("description")} id="jobDescription" placeholder="Job Description" rows={10} /> */}
+                            <Editor
+                                value={jobDescription}
+                                onChange={(v: any) => setJobDescription(v)}
+                            />
                         </div>
                         <div className="flex gap-5 mb-5">
                             <div className="flex flex-col w-1/2">
@@ -191,7 +198,7 @@ type Props = {
 
 type UpdateJobFormData = {
     jobTitle: string,
-    description: string,
+    // description: string,
     jobType: string,
     qualificationRequired: string,
     experienceRequired: string

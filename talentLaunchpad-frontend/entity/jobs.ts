@@ -14,5 +14,6 @@ export type Job = {
     employee_resume: string,
     experience_required: string,
     qualification_required: string,
-    industry: string
+    industry: string,
+    company_logo: string
 }

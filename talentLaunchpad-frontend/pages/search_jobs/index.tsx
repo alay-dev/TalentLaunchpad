@@ -8,7 +8,7 @@ import { Job } from '@/entity/jobs'
 import Link from 'next/link'
 import { useAppSelector } from '@/hooks/useAppSelector'
 import { useAppDispatch } from '@/hooks/useAppDispatch'
-import { getJobsByFilter } from '@/slices/job/jobSlice'
+import { getJobsByFilter, setSearchTerm } from '@/slices/job/jobSlice'
 
 // type Props = {
 //     jobs: Job[]
@@ -16,13 +16,13 @@ import { getJobsByFilter } from '@/slices/job/jobSlice'
 
 const SearchJobs = () => {
     // console.log(jobs);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [location, setLocation] = useState("");
+    // const [searchTerm, setSearchTerm] = useState("");
+    // const [location, setLocation] = useState("");
     const [isFullTime, setIsFullTime] = useState(true);
     const [isFreelance, setIsFreelance] = useState(true);
     const [isInternship, setIsInternship] = useState(true);
 
-    const jobs = useAppSelector(state => state.job.data)
+    const jobs = useAppSelector(state => state.job)
 
     const dispatch = useAppDispatch();
 
@@ -45,10 +45,10 @@ const SearchJobs = () => {
     useEffect(() => {
         dispatch(getJobsByFilter({
             jobType: get_job_type(),
-            location: location,
-            searchTerm: searchTerm
+            location: jobs?.searchLocation,
+            searchTerm: jobs.searchTerm
         }))
-    }, [isFreelance, isFullTime, isInternship, searchTerm])
+    }, [isFreelance, isFullTime, isInternship, jobs.searchTerm])
 
     return (
         <>
@@ -56,7 +56,7 @@ const SearchJobs = () => {
             <div className='mt-20 px-10 py-5 flex gap-10 items-start' >
                 <div className='w-96  bg-cyan-50 p-5 rounded-md shadow-sm max-h-max '>
                     <h2 className='text-xl  font-medium mb-2'>Search by keywords</h2>
-                    <TextField className='bg-white ' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} fullWidth placeholder='job title, keywords or company' />
+                    <TextField className='bg-white ' value={jobs?.searchTerm} onChange={(e) => dispatch(setSearchTerm(e.target.value))} fullWidth placeholder='job title, keywords or company' />
 
                     <h2 className='mt-6 text-xl font-medium mb-2'>Location</h2>
                     <TextField className='bg-white ' fullWidth placeholder='City or pincode' />
@@ -78,8 +78,8 @@ const SearchJobs = () => {
                 </div>
                 <div className='flex-1'>
                     <div className='flex flex-col gap-5'>
-                        {jobs?.length === 0 && <p>No jobs to show!!</p>}
-                        {jobs?.map?.(job => {
+                        {jobs?.data?.length === 0 && <p>No jobs to show!!</p>}
+                        {jobs?.data?.map?.(job => {
                             return <Link key={job.id} href={`/job/${job.id}`} >
                                 <JobCard
                                     key={job.id}
@@ -90,6 +90,7 @@ const SearchJobs = () => {
                                     salary={job.salary}
                                     jobId={job.id}
                                     createdAt={job.created_at}
+                                    companyLogo={job.company_logo}
                                 />
                             </Link>
                         })}

@@ -105,7 +105,7 @@ const JobDetail = ({ job, company }: Props) => {
                     <div className='flex gap-16' >
                         <div className='w-7/12' >
                             <h3 className='font-medium text-xl mb-5'>Job Description</h3>
-                            <p className='text-gray-500 leading-7' >{job.description}</p>
+                            <div className='[&>ul]:list-disc [&>ul]:ml-8 [&>ol]:text-gray-600 [&>ol]:list-decimal [&>ol]:ml-8 [&>ul]:text-gray-600 [&>h2]:text-3xl [&>h2]:font-bold [&>h3]:text-2xl [&>h3]:font-semibold [&>h4]:text-lg [&>h4]:font-medium [&>p]:text-gray-600' dangerouslySetInnerHTML={{ __html: job?.description }} />
                             <button className=" bg-blue-500 text-white rounded-md py-3 mt-8 hover:shadow-md transition duration-200 hover:bg-blue-600 w-80 " >Compare resume</button>
                         </div>
                         <div className='w-5/12'>
@@ -163,7 +163,7 @@ const JobDetail = ({ job, company }: Props) => {
                                     <Image className='rounded-md' alt="company logo" width={60} height={60} src={`${UNIVERSAL.BASEURL}/company/${company?.company_logo}`} />
                                     <div>
                                         <h3 className='font-medium text-lg'>{company.company_name}</h3>
-                                        <Link className='text-blue-500 ' href="/company/2">View company profile</Link>
+                                        <Link className='text-blue-500 ' href={`/company/${company?.id}`}>View company profile</Link>
                                     </div>
                                 </div>
                                 <ul className='flex flex-col gap-5 mt-6 text-gray-900'>

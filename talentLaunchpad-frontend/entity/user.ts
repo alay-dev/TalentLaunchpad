@@ -4,6 +4,7 @@ export type User = {
     updated_at: Date,
     bio: string,
     avatar: string,
+    gender: string,
     email: string,
     phone: string,
     company_id: number,

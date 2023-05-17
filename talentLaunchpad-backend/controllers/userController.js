@@ -74,14 +74,15 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     phone,
     name,
     website,
-    current_salary,
-    expected_salary,
+    currentSalary,
+    expectedSalary,
     age,
     experience,
-    linkedin_link,
-    github_link,
-    twitter_link,
-    facebook_link,
+    linkedinLink,
+    githubLink,
+    twitterLink,
+    facebookLink,
+    gender,
   } = req.body;
 
   console.log(req.body);
@@ -92,14 +93,15 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     phone = '${phone}',
     name = '${name}',
     website = '${website}',
-    current_salary = '${current_salary}',
-    expected_salary = '${expected_salary}',
+    gender = '${gender}',
+    current_salary = '${currentSalary}',
+    expected_salary = '${expectedSalary}',
     age = ${Number(age)},
     experience = '${experience}',
-    linkedin_link = '${linkedin_link}',
-    github_link = '${github_link}',
-    twitter_link = '${twitter_link}',
-    facebook_link = '${facebook_link}',
+    linkedin_link = '${linkedinLink}',
+    github_link = '${githubLink}',
+    twitter_link = '${twitterLink}',
+    facebook_link = '${facebookLink}',
     updated_at = '${new Date().toISOString()}'
     WHERE id = ${user_id}
     RETURNING * ;`

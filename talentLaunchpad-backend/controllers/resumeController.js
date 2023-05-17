@@ -21,13 +21,16 @@ exports.uploadResume = uploadResumeStorage.single("resume");
 exports.updateResumeLink = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
+  console.log(req.file);
+
   if (!req.file.path) {
     return new AppError("Failed to uload CV try again.", 400);
   }
 
   const { rows: updatedUserRows } = await pool.query(
-    `UPDATE resume 
-    SET resume_link = '${req.file.filename}',  
+    `UPDATE resume
+    SET resume_link = '${req.file.filename}',
+    resume_name = '${req.file.originalname}',
     updated_at = '${new Date().toISOString()}'
     WHERE user_id = ${user_id}
     RETURNING * ;`
@@ -183,9 +186,6 @@ exports.updateResume = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Resume updated",
-    data: {
-      ...updatedResume[0],
-    },
   });
 });
 

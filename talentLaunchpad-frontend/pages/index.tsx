@@ -3,14 +3,20 @@ import { Button } from "@mui/material"
 import { HiOutlineUserPlus, HiOutlineDocumentDuplicate, HiOutlineDocumentCheck } from "react-icons/hi2"
 import Header from '@/components/header/Header';
 import { useRouter } from 'next/router';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
+import { useAppSelector } from '@/hooks/useAppSelector';
+import { setSearchLocation, setSearchTerm } from '@/slices/job/jobSlice';
 
 export default function Home() {
 
   const router = useRouter()
+  const job = useAppSelector(state => state.job)
+
+  const dispatch = useAppDispatch();
+
 
   return (
     <>
-
       <Header />
       <div className="">
         {/* hero starts */}
@@ -23,14 +29,14 @@ export default function Home() {
             <div className='bg-white py-6 px-10 rounded-lg shadow-sm flex items-center mt-10 gap-4' >
               <div className='w-56'>
                 <h3 className='font-medium'>What</h3>
-                <input className='py-1 w-full outline-none' placeholder='job title, keywords or company' />
+                <input className='py-1 w-full outline-none' value={job.searchTerm} onChange={(e) => dispatch(setSearchTerm(e.target.value))} placeholder='job title, keywords or company' />
               </div>
               <div className='w-0.5 h-14 bg-gray-300' />
               <div className='w-56'>
                 <h3 className='font-medium'>Where</h3>
-                <input className='py-1 w-full outline-none' placeholder='City or postcode' />
+                <input className='py-1 w-full outline-none' value={job.searchLocation} onChange={(e) => dispatch(setSearchLocation(e.target.value))} placeholder='City or postcode' />
               </div>
-              <Button className='h-16 bg-violet-600' variant="contained" >Find jobs</Button>
+              <Button className='h-16 bg-violet-600' onClick={() => router.push("/search_jobs")} variant="contained" >Find jobs</Button>
             </div>
           </div>
           <Image draggable={false} alt="Hero image" width={800} height={300} src="/assets/heroRight.png" />

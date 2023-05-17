@@ -1,18 +1,22 @@
 import DashboardLayout from "@/components/dashboardLayout/DashboardLayout"
 import { useAppSelector } from "@/hooks/useAppSelector"
 import Image from "next/image"
-import { HiPencil } from "react-icons/hi"
+import dynamic from "next/dynamic";
+import { HiOutlineEye, HiPencil } from "react-icons/hi"
 import { useForm } from "react-hook-form"
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react"
 import { useAppDispatch } from "@/hooks/useAppDispatch"
 import { changeProfilePic, fetchUserProfile, updateUserProfile } from "@/slices/user/userSlice"
-import { Modal } from "@mui/material"
+import { Alert, AlertColor, Modal, Snackbar } from "@mui/material"
 import UNIVERSAL from "@/config/config"
+const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const Profile = () => {
+    const [bio, setBio] = useState("")
     const [changeAvatarModal, setChangeAvatarModal] = useState(false)
     const [avatarTmp, setAvatarTmp] = useState<any>(null)
+    const [updateProfileMessage, setUpdateProfileMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
 
     const user = useAppSelector(state => state.user.data)
     const auth = useAppSelector(state => state.authentication)
@@ -23,34 +27,27 @@ const Profile = () => {
 
     const update_profile = (data: updateProfileData) => {
         dispatch(updateUserProfile({
-            bio: data.aboutYou,
-            phone: data.phone,
-            resume: data.resume,
-            name: data.fullName,
-            website: data.website,
-            current_salary: data.currentSalary,
-            expected_salary: data.expectedSalary,
-            age: data.age,
-            experience: data.experience,
-            linkedin_link: data.linkedinLink,
-            github_link: data.githubLink,
-            twitter_link: data.twitterLink,
-            facebook_link: data.facebookLink,
+            ...data,
+            bio: bio,
             token: auth.data.token
         })).unwrap()
-            .then(() => dispatch(fetchUserProfile({ token: auth.data.token })))
+            .then(() => { dispatch(fetchUserProfile({ token: auth.data.token })); setUpdateProfileMessage({ severity: "success", message: "Profile updated" }) })
+            .catch(err => setUpdateProfileMessage({ severity: "error", message: err.message }))
     }
 
     useEffect(() => {
+        setBio(user?.bio)
+    }, [user.bio])
+
+    useEffect(() => {
         reset({
-            fullName: user.name,
+            name: user.name,
             phone: user.phone,
             email: user.email,
             website: user.website,
             currentSalary: user.current_salary,
             expectedSalary: user.expected_salary,
             experience: user.experience,
-            aboutYou: user.bio,
             age: user.age,
             githubLink: user.github_link,
             linkedinLink: user.linkedin_link,
@@ -69,15 +66,33 @@ const Profile = () => {
     const handle_upload_avatar = () => {
         dispatch(changeProfilePic({ token: auth.data.token, avatar: avatarTmp }))
             .unwrap()
-            .then(() => { dispatch(fetchUserProfile({ token: auth.data.token })); setChangeAvatarModal(false) })
+            .then(() => {
+                dispatch(fetchUserProfile({ token: auth.data.token }));
+                setChangeAvatarModal(false);
+                setUpdateProfileMessage({ severity: "success", message: "Profile picture updated" })
+            })
+            .catch(err => setUpdateProfileMessage({ severity: "error", message: err.message }))
     }
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setUpdateProfileMessage({ severity: "", message: "" });
+    };
 
     return (
         <DashboardLayout>
-
             <div className="w-full">
+                <div className="flex justify-between items-center">
+                    <h1 className='font-medium text-3xl '>My Profile</h1>
+                    <button className=" flex gap-1 items-center bg-blue-500 text-white rounded-md py-2 px-3 text-sm mt-5 hover:shadow-md transition duration-200 hover:bg-blue-600" onClick={() => router.push(`/user/${user?.id}`)}>
+                        <HiOutlineEye className="text-lg" />
+                        See public profile
+                    </button>
+                </div>
 
-                <h1 className='font-medium text-3xl '>My Profile</h1>
                 <div className="bg-white rounded-lg mt-8 shadow-[0_6px_15px_rgba(64,79,104,.05)]   p-5">
                     <div className=" relative w-36 h-36 rounded-full flex justify-center items-center"  >
                         <Image alt="avatar" className="object-cover rounded-full " fill src={user?.avatar ? `${UNIVERSAL.BASEURL}/profilePic/${user.avatar}` : "/assets/avatar.png"} />
@@ -91,12 +106,16 @@ const Profile = () => {
 
                         <div className="flex gap-5 mb-5">
                             <div className="flex flex-col w-1/2">
-                                <label className="mb-1 font-medium" htmlFor="fullName">Full Name</label>
-                                <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("fullName")} id="fullName" placeholder="Full Name" type="text" />
+                                <label className="mb-1 font-medium" htmlFor="name">Full Name</label>
+                                <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("name")} id="name" placeholder="Full Name" type="text" />
                             </div>
                             <div className="flex flex-col w-1/2">
-                                <label className="mb-1 font-medium" htmlFor="Job Title">Job Title</label>
-                                <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("jobTitle")} id="Job Title" placeholder="Job Title" type="text" />
+                                <label className="mb-1 font-medium" htmlFor="gender">Gender</label>
+                                <select className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("gender")} id="gender" >
+                                    <option value="Male" >Male</option>
+                                    <option value="Female" >Female</option>
+                                    <option value="Other" >Other</option>
+                                </select>
                             </div>
                         </div>
                         <div className="flex gap-5 mb-5">
@@ -136,8 +155,11 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="flex flex-col w-full">
-                            <label className="mb-1 font-medium" htmlFor="aboutYou">About you</label>
-                            <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("aboutYou")} id="aboutYou" placeholder="About you" rows={10} />
+                            <label className="mb-1 font-medium" htmlFor="bio">About you</label>
+                            <Editor
+                                value={bio}
+                                onChange={(v: any) => setBio(v)}
+                            />
                         </div>
                         <div className="flex gap-5 mb-5 mt-4">
                             <div className="flex flex-col w-1/2">
@@ -175,6 +197,11 @@ const Profile = () => {
                     </div>
                 </div>
             </Modal>
+            <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} open={Boolean(updateProfileMessage.message)} autoHideDuration={6000} onClose={handleClose}>
+                <Alert variant='filled' severity={updateProfileMessage.severity as AlertColor} onClose={handleClose} sx={{ width: '100%' }}>
+                    {updateProfileMessage.message}
+                </Alert>
+            </Snackbar>
         </DashboardLayout >
     )
 }
@@ -182,12 +209,11 @@ const Profile = () => {
 export default Profile
 
 type updateProfileData = {
-    bio: string,
-    avatar: string,
+    // bio: string,
     email: string,
     phone: string,
     resume: string,
-    fullName: string,
+    name: string,
     website: string,
     currentSalary: string,
     expectedSalary: string,
@@ -197,6 +223,5 @@ type updateProfileData = {
     githubLink: string,
     twitterLink: string,
     facebookLink: string,
-    jobTitle: string,
-    aboutYou: string
+    gender: string
 }

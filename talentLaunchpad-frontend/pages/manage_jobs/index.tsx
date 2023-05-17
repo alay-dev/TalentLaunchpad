@@ -121,7 +121,7 @@ const ManageJob = () => {
                     {applicantModal[0]?.applied_at &&
                         <ul className='flex flex-col gap-4 max-h-[20rem] overflow-auto ' >
                             {applicantModal && applicantModal?.map(item => {
-                                return <li className='flex gap-2'>
+                                return <li className='flex gap-2' key={item.user_id}>
                                     <div className='w-12  relative' >
                                         <Image alt="avatar" className="object-cover rounded-full " fill src={"/assets/avatar.png"} />
                                     </div>

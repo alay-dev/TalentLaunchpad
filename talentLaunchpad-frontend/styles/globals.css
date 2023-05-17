@@ -13,4 +13,68 @@
   --dashboard-side-menu-width : 17rem
 }
 
+/* CK EDITOR STYLES  */
+
+.ck {
+  font-family: "__Jost_0b4fd6";
+}
+
+.ck .ck-toolbar__items >*:nth-child(8) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(9) {
+  display:  none;
+}
+.ck .ck-toolbar__items >*:nth-child(10) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(11) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(12) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(13) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(14) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(15) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(16) {
+  display:  none;
+}
+
+.ck .ck-toolbar__items >*:nth-child(17) {
+  display:  none;
+}
+
+.ck h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.ck h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.ck h4 {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+
+.ck ul, ol {
+  margin-left: 2rem ;
+}
 

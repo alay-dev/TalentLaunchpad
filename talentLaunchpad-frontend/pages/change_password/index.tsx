@@ -7,7 +7,7 @@ import { Alert, AlertColor, Snackbar } from "@mui/material";
 import { useForm } from "react-hook-form";
 
 
-const index = () => {
+const ChangePassword = () => {
     const auth = useAppSelector(state => state.authentication.data);
     const [changePasswordMessage, setChangePasswordMessage] = useState<{ message: string, severity: string }>({ message: "", severity: "" })
 
@@ -58,7 +58,7 @@ const index = () => {
                                 type="password"
                             />
                             {errors.confirmPassword && errors.confirmPassword.type === "validate" &&
-                                <p className="text-red-600 mt-3" >*Confirm password doesn't match the New password</p>
+                                <p className="text-red-600 mt-3" >*Confirm password doesn&apos;t match the New password</p>
                             }
                         </div>
                         <button type="submit" className="bg-blue-500 text-white rounded-md py-3 mt-5 hover:shadow-md transition duration-200 hover:bg-blue-600 w-60" >Update</button>
@@ -70,7 +70,7 @@ const index = () => {
     )
 }
 
-export default index
+export default ChangePassword
 
 type ChangePasswordFormData = {
     currentPassword: string,

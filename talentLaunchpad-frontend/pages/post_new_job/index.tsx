@@ -1,13 +1,16 @@
 import DashboardLayout from '@/components/dashboardLayout/DashboardLayout'
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
+import dynamic from "next/dynamic";
 import { IoMdClose } from "react-icons/io"
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { addJobDetail, getUserJobs } from '@/slices/job/jobSlice';
 import { Alert, AlertColor, Snackbar } from '@mui/material';
+const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const PostNewJob = () => {
+    const [jobDescription, setJobDescription] = useState("");
     const [skills, setSkills] = useState<string[]>([]);
     const [skillTmp, setSkillTmp] = useState("");
     const [postJobMessage, setPostJobMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
@@ -46,6 +49,7 @@ const PostNewJob = () => {
             ...data,
             skillsRequired: skills.toString(),
             companyId: user.data.company_id,
+            description: jobDescription,
             token: auth.token
         })).unwrap()
             .then(() => { dispatch(getUserJobs({ token: auth.token })); setPostJobMessage({ severity: "success", message: "New job successfully posted" }) })
@@ -85,7 +89,10 @@ const PostNewJob = () => {
                             </div>
                             <div className="flex flex-col w-full mb-5">
                                 <label className="mb-1 font-medium" htmlFor="jobDescription">Job Description</label>
-                                <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md"  {...register("description")} id="jobDescription" placeholder="Job Description" rows={10} />
+                                <Editor
+                                    value={jobDescription}
+                                    onChange={(v: any) => setJobDescription(v)}
+                                />
                             </div>
                             <div className="flex gap-5 mb-5">
                                 <div className="flex flex-col w-1/2">
@@ -114,7 +121,6 @@ const PostNewJob = () => {
                                         <option value="Chennai" >Chennai</option>
                                         <option value="Delhi" >Delhi</option>
                                         <option value="Remote" >Remote</option>
-
                                     </select>
                                 </div>
                             </div>
@@ -177,7 +183,7 @@ export default PostNewJob
 
 type PostJobFormData = {
     jobTitle: string,
-    description: string,
+    // description: string,
     jobType: string,
     industry: string,
     qualificationRequired: string,

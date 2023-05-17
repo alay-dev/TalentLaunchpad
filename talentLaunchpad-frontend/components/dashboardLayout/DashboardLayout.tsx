@@ -53,12 +53,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="bg-gray-100 min-h-screen pt-[var(--header-height)] flex relative">
                 <div className="py-10 px-4 bg-white w-[var(--dashboard-side-menu-width)] h-full shadow-[0_6px_15px_rgba(64,79,104,.05)] fixed top-[var(--header-height)] left-0">
                     <ul className="w-full flex flex-col gap-1 " >
-                        <Link href="/dashboard">
+                        {/* <Link href="/dashboard">
                             <li onClick={() => setActivePage("dashboard")} className={` transition duration-150 cursor-pointer ${router.pathname === "/dashboard" ? "text-blue-500 bg-gray-100" : ""} hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full `} >
                                 <RxDashboard className="text-xl" />
                                 <p>Dashboard</p>
                             </li>
-                        </Link>
+                        </Link> */}
                         {user?.user_type === "employer" &&
                             <Link href="/company_profile">
                                 <li onClick={() => setActivePage("companyProfile")} className={` ${router.pathname === "/company_profile" ? "text-blue-500 bg-gray-100" : ""} hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >

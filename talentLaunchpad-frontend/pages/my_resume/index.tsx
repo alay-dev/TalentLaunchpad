@@ -10,6 +10,7 @@ import { useAppDispatch } from "@/hooks/useAppDispatch"
 import { addEducation, addProject, addWorkExperience, changeResume, deleteEducation, deleteWorkExperience, getResume, updateResume } from "@/slices/resume/resumeSlice"
 import { useAppSelector } from "@/hooks/useAppSelector"
 import moment from "moment"
+import UNIVERSAL from "@/config/config"
 
 
 const MyResume = () => {
@@ -169,10 +170,21 @@ const MyResume = () => {
             <div className="w-full">
                 <h1 className='font-medium text-3xl '>My Resume</h1>
                 <div className="bg-white rounded-lg mt-8 shadow-[0_6px_15px_rgba(64,79,104,.05)]   p-5">
-                    <div className="flex flex-col w-1/2">
-                        <label className="mb-1 font-medium" htmlFor="CV">Upload your Resume</label>
-                        <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" onChange={(e) => handle_change_resume(e.target.files)} id="CV" placeholder="Select your resume" type="file" />
-                    </div>
+                    {resume?.data?.resume_link &&
+                        <div className="flex items-center gap-3 w-1/2 ">
+                            <a target="_blank" href={`${UNIVERSAL.BASEURL}/resume/${resume?.data?.resume_link}`} >
+                                <p className="text-blue-500 hover:underline cursor-pointer" >{resume?.data?.resume_name}</p>
+                            </a>
+                            <label className="cursor-pointer text-sm mb-1 font-medium bg-slate-200 hover:text-blue-600 hover:shadow-sm transition duration-200 text-blue-500 w-max py-2 px-4 rounded-md " htmlFor="resume">Change resume</label>
+                            <input className="focus:bg-white hidden  focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" onChange={(e) => handle_change_resume(e.target.files)} id="resume" placeholder="Select your resume" type="file" />
+                        </div>
+                    }
+                    {!resume?.data?.resume_link &&
+                        <div className="flex flex-col w-1/2">
+                            <label className="mb-1 font-medium" htmlFor="CV">Upload your Resume</label>
+                            <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" onChange={(e) => handle_change_resume(e.target.files)} id="CV" placeholder="Select your resume" type="file" />
+                        </div>
+                    }
                     <div className="flex flex-col w-full mt-5 ">
                         <label className="mb-1 font-medium" htmlFor="Description">Description</label>
                         <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md"
@@ -193,6 +205,8 @@ const MyResume = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-8">
+                        {resume?.data?.educations?.length === 0 && <p className="text-sm text-gray-400">Complete Your Profile: Add Education Details for a Comprehensive Profile</p>}
+
                         {resume?.data?.educations?.map((item: any) => {
                             return <div key={item.id} >
                                 <div className="flex gap-5 items-center">
@@ -226,7 +240,8 @@ const MyResume = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-8">
-                        {resume?.data?.workExperience?.map((item: any) => {
+                        {resume?.data?.work_experience?.length === 0 && <p className="text-sm text-gray-400" >Highlight Your Expertise: Enhance Your Profile with Work Experience</p>}
+                        {resume?.data?.work_experience?.map((item: any) => {
                             return <div key={item.id}>
                                 <div className="flex gap-5 items-center">
                                     <h3 className="font-medium text-xl" >{item.job_title}</h3>
@@ -260,6 +275,8 @@ const MyResume = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-8">
+                        {resume?.data?.projects?.length === 0 && <p className="text-sm text-gray-400">Showcase Your Skills: Add Project Details to Enhance Your Profile</p>}
+
                         {resume?.data?.projects?.map((item: any) => {
                             return <div key={item.id}>
                                 <div className="flex gap-5 items-center">

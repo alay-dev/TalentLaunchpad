@@ -182,6 +182,7 @@ const authenticationSlice = createSlice({
           status: "active",
           user_type: "candidate",
           name: "asd",
+          resume: "",
           website: "",
           current_salary: "",
           expected_salary: "",

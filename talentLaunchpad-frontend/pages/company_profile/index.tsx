@@ -9,8 +9,11 @@ import { addCompanyDetail, changeCompanyLogo, getUserCompany, updateCompanyDetai
 import { useEffect } from 'react';
 import { Alert, AlertColor, Modal, Snackbar } from "@mui/material";
 import UNIVERSAL from "@/config/config";
+import dynamic from "next/dynamic";
+const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const CompanyProfile = () => {
+    const [companyDescription, setCompanyDescription] = useState("");
     const [changeLogoModal, setChangeLogoModal] = useState(false)
     const [logoTmp, setLogoTmp] = useState<any>(null)
     const [updateCompanyMessage, setUpdateCompanyMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
@@ -26,6 +29,7 @@ const CompanyProfile = () => {
         if (company.data.id) {
             dispatch(updateCompanyDetail({
                 ...data,
+                aboutCompany: companyDescription,
                 token: auth.token
             })).unwrap()
                 .then(() => {
@@ -38,6 +42,7 @@ const CompanyProfile = () => {
         } else {
             dispatch(addCompanyDetail({
                 ...data,
+                aboutCompany: companyDescription,
                 token: auth.token
             })).unwrap()
                 .then(() => dispatch(getUserCompany({
@@ -58,7 +63,7 @@ const CompanyProfile = () => {
                 email: company.data.email,
                 website: company.data.website,
                 companySize: company.data.company_size,
-                aboutCompany: company.data.description,
+                // aboutCompany: company.data.description,
                 estSince: company.data.est_since,
                 facebookLink: company.data.facebook_link,
                 googlePlusLink: company.data.google_plus_link,
@@ -96,6 +101,10 @@ const CompanyProfile = () => {
 
         setUpdateCompanyMessage({ severity: "", message: "" });
     };
+
+    useEffect(() => {
+        setCompanyDescription(company?.data?.description)
+    }, [company?.data?.description])
 
     return (
         <DashboardLayout>
@@ -155,7 +164,11 @@ const CompanyProfile = () => {
                         </div>
                         <div className="flex flex-col w-full">
                             <label className="mb-1 font-medium" htmlFor="aboutCompany">About company</label>
-                            <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("aboutCompany")} id="aboutCompany" placeholder="About company" rows={10} />
+                            {/* <textarea className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("aboutCompany")} id="aboutCompany" placeholder="About company" rows={10} /> */}
+                            <Editor
+                                value={companyDescription}
+                                onChange={(v: any) => setCompanyDescription(v)}
+                            />
                         </div>
                         <h3 className='font-medium text-lg mt-8' >Social network</h3>
                         <div className="flex gap-5 mb-5 mt-4">
@@ -229,7 +242,7 @@ type AddCompanyFormData = {
     website: string,
     estSince: string,
     companySize: string,
-    aboutCompany: string,
+    // aboutCompany: string,
     linkedinLink: string,
     googlePlusLink: string,
     twitterLink: string,

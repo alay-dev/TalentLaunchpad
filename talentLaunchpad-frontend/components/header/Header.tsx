@@ -16,6 +16,7 @@ import Image from "next/image"
 import { Comfortaa } from "next/font/google"
 import { TbTopologyStar } from "react-icons/tb"
 import { CiViewTimeline } from "react-icons/ci"
+import UNIVERSAL from "@/config/config"
 
 const comfortaa = Comfortaa({
     weight: ["500", "600", "700"],
@@ -90,24 +91,24 @@ const Header = () => {
                     </Link>
                 </div >
                 <div className="flex items-center" >
-                    <ul className="flex gap-2 items-center" >
+                    <ul className="flex gap-1 items-center" >
                         <Link href="/search_jobs">
-                            <li className="transition-all duration-75 py-2 px-3 rounded-md hover:bg-slate-200 cursor-pointer">Find Jobs</li>
+                            <li className="self-stretch text-gray-600 transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer">Find Jobs</li>
                         </Link>
                         {auth.data.token &&
                             <>
-                                <Link href="/dashboard">
-                                    <li className=" flex gap-2 items-center transition-all duration-75 py-2 px-3 rounded-md hover:bg-slate-200 cursor-pointer">
-                                        {/* <Avatar /> */}
-                                        <p>Dashboard</p>
+                                <Link href="/my_profile">
+                                    <li className="self-stretch flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer text-gray-600">
+                                        <Avatar src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} sx={{ width: "2rem", height: "2rem" }} />
+                                        <p>{auth?.data?.user?.name?.split(" ")[0]}</p>
                                     </li>
                                 </Link>
-                                <Tooltip arrow title="logout">
-                                    <li className=" flex gap-2 items-center transition-all duration-75 py-2 px-3 rounded-md hover:bg-slate-200 cursor-pointer" onClick={() => handle_logout()}>
-                                        <RiLogoutCircleRLine className="text-xl" />
-                                        <p>Logout</p>
-                                    </li>
-                                </Tooltip>
+
+                                <li className="self-stretch text-gray-600 flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer" onClick={() => handle_logout()}>
+                                    <RiLogoutCircleRLine className="text-lg" />
+                                    <p>Logout</p>
+                                </li>
+
                             </>
                         }
                         {!auth.data.token &&
@@ -206,7 +207,7 @@ const Header = () => {
                                 <label className="mt-3 mb-1 font-medium" htmlFor="confirmPassword">Confirm Password</label>
                                 <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" id="confirmPassword"  {...registerSignup("confirmPassword", { required: true, validate: () => getSignupValues("confirmPassword") === getSignupValues("password") })} placeholder="Confrm Password" type="password" />
                                 {signupError.confirmPassword && signupError.confirmPassword.type === "validate" &&
-                                    <p className="text-red-500 mt-3" >Confirm password doesn't match the New password</p>
+                                    <p className="text-red-500 mt-3" >Confirm password doesn&apos;t match the New password</p>
                                 }
                                 <button className="bg-blue-500 text-white rounded-md py-3 mt-5 hover:shadow-md transition duration-200 hover:bg-blue-600" >Register</button>
                             </form>

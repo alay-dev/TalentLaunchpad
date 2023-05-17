@@ -14,6 +14,8 @@ type InitialState = {
         error: string,
         loading: boolean
     },
+    searchTerm: string,
+    searchLocation: string,
     error: string
     loading: boolean
 }
@@ -30,6 +32,8 @@ const initialState: InitialState = {
         error: "",
         loading: false
     },
+    searchTerm: "",
+    searchLocation: "",
     error: "",
     loading: false
 }
@@ -41,11 +45,10 @@ type AppliedJob = {
     status: string,
     message: string,
     resume: string,
-    job_industry: string,
-    location: string
+    industry: string,
+    location: string,
+    company_logo: string,
 }
-
-
 
 type AddJobPayload = {
     companyId: number,
@@ -264,7 +267,12 @@ const jobSlice = createSlice({
     name: 'job',
     initialState,
     reducers: {
-
+        setSearchTerm: (state, action) => {
+            state.searchTerm = action.payload
+        },
+        setSearchLocation: (state, action) => {
+            state.searchLocation = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(addJobDetail.pending, (state) => {
@@ -330,3 +338,4 @@ const jobSlice = createSlice({
 });
 
 export default jobSlice.reducer;
+export const { setSearchLocation, setSearchTerm } = jobSlice.actions

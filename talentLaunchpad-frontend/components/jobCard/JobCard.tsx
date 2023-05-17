@@ -4,6 +4,7 @@ import { CiLocationOn, CiTimer } from "react-icons/ci"
 import { BsCashCoin, BsBookmarkPlus } from "react-icons/bs"
 import { IconButton } from "@mui/material"
 import moment from 'moment'
+import UNIVERSAL from '@/config/config'
 
 type Props = {
     jobId: number,
@@ -12,10 +13,11 @@ type Props = {
     location: string,
     salary: string,
     jobType: string,
+    companyLogo: string
     createdAt: Date
 }
 
-const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, createdAt }: Props) => {
+const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, createdAt, companyLogo }: Props) => {
     return (
         <div className='flex items-start gap-5 border p-5 rounded-lg  hover:shadow-xl transition-all cursor-pointer relative' >
             <div className='absolute top-2 right-2'>
@@ -23,7 +25,7 @@ const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, created
                     <BsBookmarkPlus size="1.2rem" />
                 </IconButton>
             </div>
-            <Image alt="company logo" width={50} height={50} src="https://superio-next.vercel.app/images/resource/company-logo/1-1.png" />
+            <Image alt="company logo" width={50} height={50} src={`${UNIVERSAL.BASEURL}/company/${companyLogo}`} />
             <div>
                 <h2 className='mb-5' >{jobTitle}</h2>
                 <div className='flex gap-8 items-center mb-4'>

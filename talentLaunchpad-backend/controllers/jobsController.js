@@ -227,9 +227,10 @@ exports.getAppliedJobs = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
   const { rows: jobRows } = await pool.query(
-    `SELECT *
+    `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs_applied
     JOIN jobs ON jobs_applied.job_id = jobs.id
+    FULL JOIN company ON jobs.company_id = company.id
     WHERE jobs_applied.user_id = ${user_id};`
   );
 
@@ -252,8 +253,9 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
 
   if (searchTerm && jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT *
+      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
+    JOIN company ON jobs.company_id = company.id
     WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
     AND job_type LIKE ANY(ARRAY[${jobTypeArray}])
     `
@@ -262,8 +264,9 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (searchTerm && !jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT *
+      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
+    JOIN company ON jobs.company_id = company.id
     WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
     `
     );
@@ -271,8 +274,9 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (!searchTerm && jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT *
+      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
+    JOIN company ON jobs.company_id = company.id
     WHERE job_type LIKE ANY(ARRAY[${jobTypeArray}])
     `
     );
@@ -280,8 +284,9 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (!searchTerm && !jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT *
+      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
+    JOIN company ON jobs.company_id = company.id
     `
     );
 
