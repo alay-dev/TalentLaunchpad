@@ -29,11 +29,12 @@ exports.updateResumeLink = catchAsync(async (req, res, next) => {
 
   const { rows: updatedUserRows } = await pool.query(
     `UPDATE resume
-    SET resume_link = '${req.file.filename}',
-    resume_name = '${req.file.originalname}',
+    SET resume_link = $1,
+    resume_name = $2,
     updated_at = '${new Date().toISOString()}'
-    WHERE user_id = ${user_id}
-    RETURNING * ;`
+    WHERE user_id = $3
+    RETURNING * ;`,
+    [req.file.filename, req.file.originalname, user_id]
   );
 
   res.status(200).json({
@@ -52,15 +53,18 @@ exports.addEducation = catchAsync(async (req, res, next) => {
 
   //   1) Check if resume with user id exits or not
   const { rows: oldResume } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = '${user.id}' ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   //   2) If not create a resume
   if (!oldResume.length) {
-    const { rows: newResume } = await pool.query(`
+    const { rows: newResume } = await pool.query(
+      `
         INSERT INTO resume (user_id,  description, skills ) 
-        VALUES(${user.id}, '', '' ) RETURNING *; 
-    `);
+        VALUES($1, '', '' ) RETURNING *;`,
+      [user.id]
+    );
 
     resume_id = newResume[0].id;
   } else {
@@ -68,10 +72,12 @@ exports.addEducation = catchAsync(async (req, res, next) => {
   }
   //   3) Add Education
 
-  const { rows: newEducation } = await pool.query(`
+  const { rows: newEducation } = await pool.query(
+    `
         INSERT INTO education (resume_id, degree, institute, start_date, end_date, description ) 
-        VALUES(${resume_id}, '${degree}', '${school}', '${startDate}', '${endDate}', '${description}' ) RETURNING *; 
-    `);
+        VALUES($1, $2, $3, $4, $5, $6 ) RETURNING *;`,
+    [resume_id, degree, school, startDate, endDate, description]
+  );
 
   console.log(user);
 
@@ -89,15 +95,18 @@ exports.addWorkExperience = catchAsync(async (req, res, next) => {
 
   //   1) Check if resume with user id exits or not
   const { rows: oldResume } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = '${user.id}' ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   //   2) If not create a resume
   if (!oldResume.length) {
-    const { rows: newResume } = await pool.query(`
+    const { rows: newResume } = await pool.query(
+      `
           INSERT INTO resume (user_id,  description, skills ) 
-          VALUES(${user.id}, '', '' ) RETURNING *; 
-      `);
+          VALUES($1, '', '' ) RETURNING *;`,
+      [user.id]
+    );
 
     resume_id = newResume[0].id;
   } else {
@@ -105,10 +114,12 @@ exports.addWorkExperience = catchAsync(async (req, res, next) => {
   }
   //   3) Add Work Experience
 
-  const { rows: newWorkExperience } = await pool.query(`
+  const { rows: newWorkExperience } = await pool.query(
+    `
           INSERT INTO work_experience (resume_id, company, job_title, start_date, end_date, description ) 
-          VALUES(${resume_id}, '${company}', '${jobTitle}', '${startDate}', '${endDate}', '${description}' ) RETURNING *; 
-      `);
+          VALUES($1, $2, $3, $4, $5, $6 ) RETURNING *;`,
+    [resume_id, company, jobTitle, startDate, endDate, description]
+  );
 
   res.status(201).json({
     status: "success",
@@ -124,15 +135,18 @@ exports.addProject = catchAsync(async (req, res, next) => {
 
   //   1) Check if resume with user id exits or not
   const { rows: oldResume } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = '${user.id}' ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   //   2) If not create a resume
   if (!oldResume.length) {
-    const { rows: newResume } = await pool.query(`
+    const { rows: newResume } = await pool.query(
+      `
             INSERT INTO resume (user_id,  description, skills ) 
-            VALUES(${user.id}, '', '' ) RETURNING *; 
-        `);
+            VALUES($1, '', '' ) RETURNING *;`,
+      [user.id]
+    );
 
     resume_id = newResume[0].id;
   } else {
@@ -140,10 +154,12 @@ exports.addProject = catchAsync(async (req, res, next) => {
   }
   //   3) Add Project
 
-  const { rows: newProject } = await pool.query(`
+  const { rows: newProject } = await pool.query(
+    `
             INSERT INTO project (resume_id, project_name, start_date, end_date, description ) 
-            VALUES(${resume_id}, '${projectName}', '${startDate}', '${endDate}', '${description}' ) RETURNING *; 
-        `);
+            VALUES($1, $2, $3, $4, $5 ) RETURNING *;`,
+    [resume_id, projectName, startDate, endDate, description]
+  );
 
   res.status(201).json({
     status: "success",
@@ -159,15 +175,18 @@ exports.updateResume = catchAsync(async (req, res, next) => {
 
   //   1) Check if resume with user id exits or not
   const { rows: oldResume } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = '${user.id}' ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   //   2) If not create a resume
   if (!oldResume.length) {
-    const { rows: newResume } = await pool.query(`
+    const { rows: newResume } = await pool.query(
+      `
               INSERT INTO resume (user_id,  description, skills ) 
-              VALUES(${user.id}, '${description}', '${skills}' ) RETURNING *; 
-        `);
+              VALUES($1, $2, $3 ) RETURNING *;`,
+      [user.id, description, skills]
+    );
 
     resume_id = newResume[0].id;
   } else {
@@ -175,11 +194,12 @@ exports.updateResume = catchAsync(async (req, res, next) => {
 
     const { rows: updatedResume } = await pool.query(
       `UPDATE resume
-        SET description = '${description}', 
-        skills = '${skills}',
+        SET description = $1, 
+        skills = $2,
         updated_at = '${new Date().toISOString()}'
-        WHERE id = ${resume_id}
-        RETURNING * ;`
+        WHERE id = $3
+        RETURNING * ;`,
+      [description, skills, resume_id]
     );
   }
 
@@ -197,15 +217,18 @@ exports.getResume = catchAsync(async (req, res, next) => {
   let resume_id;
   //   1) Check if resume with user id exits or not
   const { rows: oldResume } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = '${user_id}' ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user_id]
   );
 
   //   2) If not create a resume
   if (!oldResume.length) {
-    const { rows: newResume } = await pool.query(`
+    const { rows: newResume } = await pool.query(
+      `
           INSERT INTO resume (user_id,  description, skills ) 
-          VALUES(${user_id}, '', '' ) RETURNING *; 
-      `);
+          VALUES($1, '', '' ) RETURNING *;`,
+      [user_id]
+    );
     resume_id = newResume[0].id;
 
     resume = newResume[0];
@@ -216,17 +239,20 @@ exports.getResume = catchAsync(async (req, res, next) => {
 
   //   3) get educations
   const { rows: educations } = await pool.query(
-    `SELECT * FROM education WHERE resume_id = '${resume_id}' ;`
+    `SELECT * FROM education WHERE resume_id = $1 ;`,
+    [resume_id]
   );
 
   //   4) get projects
   const { rows: projects } = await pool.query(
-    `SELECT * FROM project WHERE resume_id = '${resume_id}' ;`
+    `SELECT * FROM project WHERE resume_id = $1 ;`,
+    [resume_id]
   );
 
   //   5) get projects
   const { rows: workExperience } = await pool.query(
-    `SELECT * FROM work_experience WHERE resume_id = '${resume_id}' ;`
+    `SELECT * FROM work_experience WHERE resume_id = $1 ;`,
+    [resume_id]
   );
 
   resume = {
@@ -247,7 +273,7 @@ exports.getResume = catchAsync(async (req, res, next) => {
 exports.removeEducation = catchAsync(async (req, res, next) => {
   const { education_id } = req.params;
 
-  await pool.query(`DELETE FROM education where id = ${education_id} ;`);
+  await pool.query(`DELETE FROM education where id = $1 ;`, [education_id]);
 
   res.status(200).json({
     status: "success",
@@ -258,7 +284,7 @@ exports.removeEducation = catchAsync(async (req, res, next) => {
 exports.removeWorkExperience = catchAsync(async (req, res, next) => {
   const { work_id } = req.params;
 
-  await pool.query(`DELETE FROM work_experience where id = ${work_id} ;`);
+  await pool.query(`DELETE FROM work_experience where id = $1 ;`, [work_id]);
 
   res.status(200).json({
     status: "success",

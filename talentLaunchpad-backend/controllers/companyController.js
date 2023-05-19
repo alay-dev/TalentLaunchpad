@@ -32,7 +32,8 @@ exports.getUserCompany = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
   const { rows: companyRow } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user_id}`
+    `SELECT * FROM company WHERE user_id = $1`,
+    [user_id]
   );
 
   if (!companyRow.length) {
@@ -49,7 +50,8 @@ exports.getCompany = catchAsync(async (req, res, next) => {
   const company_id = req.params.id;
 
   const { rows: companyRow } = await pool.query(
-    `SELECT * FROM company WHERE id = ${company_id}`
+    `SELECT * FROM company WHERE id = $1`,
+    [company_id]
   );
 
   if (!companyRow.length) {
@@ -85,14 +87,16 @@ exports.createCompany = catchAsync(async (req, res, next) => {
   const location = `${city}, ${country}`;
 
   const { rows: companyRow } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user_id}`
+    `SELECT * FROM company WHERE user_id = $1`,
+    [user_id]
   );
 
   if (companyRow.length) {
     return next(new AppError("Company already exits try editing.", 400));
   }
 
-  const { rows: newCompanyRows } = await pool.query(`
+  const { rows: newCompanyRows } = await pool.query(
+    `
   INSERT INTO company (
     user_id, 
     company_name, 
@@ -111,23 +115,26 @@ exports.createCompany = catchAsync(async (req, res, next) => {
     primary_industry
   ) 
   VALUES(
-    ${user_id}, 
-    '${companyName}', 
-    '${location}', 
-    '${aboutCompany}',
-    '${estSince}',
-    '${companySize}', 
-    '${phone}', 
-    '${email}', 
-    '${facebookLink}',
-    '${twitterLink}',
-    '${googlePlusLink}',
-    '${linkedinLink}',
-    '${website}',
-    '${completeAddress}',
-    '${primaryIndustry}'
-   ) RETURNING *;
-  `);
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+   ) RETURNING *;`,
+    [
+      user_id,
+      companyName,
+      location,
+      aboutCompany,
+      estSince,
+      companySize,
+      phone,
+      email,
+      facebookLink,
+      twitterLink,
+      googlePlusLink,
+      linkedinLink,
+      website,
+      completeAddress,
+      primaryIndustry,
+    ]
+  );
 
   res.status(201).json({
     status: "success",
@@ -161,33 +168,52 @@ exports.updateCompany = catchAsync(async (req, res, next) => {
   const location = `${city}, ${country}`;
 
   const { rows: companyRow } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user_id}`
+    `SELECT * FROM company WHERE user_id = $1`,
+    [user_id]
   );
 
   if (!companyRow.length) {
     return next(new AppError("Company does not exists try adding.", 400));
   }
 
-  const { rows: updatedCompanyRows } = await pool.query(`
+  const { rows: updatedCompanyRows } = await pool.query(
+    `
   UPDATE company 
-    SET company_name  = '${companyName}', 
-    location = '${location}', 
-    description = '${aboutCompany}', 
-    est_since = '${estSince}',
-    company_size = '${companySize}', 
-    phone = '${phone}', 
-    email = '${email}', 
-    facebook_link = '${facebookLink}',  
-    twitter_link = '${twitterLink}', 
-    google_plus_link = '${googlePlusLink}', 
-    linkedin_link = '${linkedinLink}', 
-    website = '${website}',
-    complete_address = '${completeAddress}',
-    primary_industry  = '${primaryIndustry}',
+    SET company_name  = $1, 
+    location = $2, 
+    description = $3, 
+    est_since = $4,
+    company_size = $5, 
+    phone = $6, 
+    email = $7, 
+    facebook_link = $8,  
+    twitter_link = $9, 
+    google_plus_link = $10, 
+    linkedin_link = $11 
+    website = $12,
+    complete_address = $13,
+    primary_industry  = $14,
     updated_at = '${new Date().toISOString()}'
-    WHERE user_id = ${user_id}
-    RETURNING *;
-  `);
+    WHERE user_id = $15
+    RETURNING *;`,
+    [
+      companyName,
+      location,
+      aboutCompany,
+      estSince,
+      companySize,
+      phone,
+      email,
+      facebookLink,
+      twitterLink,
+      googlePlusLink,
+      linkedinLink,
+      website,
+      completeAddress,
+      primaryIndustry,
+      user_id,
+    ]
+  );
 
   res.status(200).json({
     status: "success",
@@ -201,7 +227,7 @@ exports.updateCompany = catchAsync(async (req, res, next) => {
 exports.deleteCompany = catchAsync(async (req, res, next) => {
   const company_id = req.params.id;
 
-  await pool.query(`DELETE FROM company where id = ${company_id} ;`);
+  await pool.query(`DELETE FROM company where id = $1 ;`, [company_id]);
 
   res.status(200).json({
     status: "success",
@@ -225,21 +251,23 @@ exports.changeCompanyLogo = catchAsync(async (req, res, next) => {
   }
 
   const { rows: companyRow } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user_id}`
+    `SELECT * FROM company WHERE user_id = $1`,
+    [user_id]
   );
 
   if (!companyRow?.length) {
-    await pool.query(
-      `INSERT INTO company(user_id) VALUES(${user_id}) RETURNING *`
-    );
+    await pool.query(`INSERT INTO company(user_id) VALUES($1) RETURNING *`, [
+      user_id,
+    ]);
   }
 
   const { rows: updatedCompanyRows } = await pool.query(
     `UPDATE  company
-    SET company_logo = '${req.file.filename}',  
+    SET company_logo = $1,  
     updated_at = '${new Date().toISOString()}'
-    WHERE user_id = ${user_id}
-    RETURNING * ;`
+    WHERE user_id = $2
+    RETURNING * ;`,
+    [req.file.filename, user_id]
   );
 
   res.status(200).json({

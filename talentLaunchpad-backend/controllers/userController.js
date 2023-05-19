@@ -25,7 +25,8 @@ exports.getProfile = catchAsync(async (req, res, next) => {
   delete user.password;
 
   const { rows: companyRows } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user.id} ;`
+    `SELECT * FROM company WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   if (companyRows.length) {
@@ -41,7 +42,8 @@ exports.getProfile = catchAsync(async (req, res, next) => {
   }
 
   const { rows: resumeRows } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = ${user.id} ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   if (resumeRows.length) {
@@ -89,22 +91,38 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 
   const { rows: updatedUserRows } = await pool.query(
     `UPDATE users 
-    SET bio = '${bio}',
-    phone = '${phone}',
-    name = '${name}',
-    website = '${website}',
-    gender = '${gender}',
-    current_salary = '${currentSalary}',
-    expected_salary = '${expectedSalary}',
-    age = ${Number(age)},
-    experience = '${experience}',
-    linkedin_link = '${linkedinLink}',
-    github_link = '${githubLink}',
-    twitter_link = '${twitterLink}',
-    facebook_link = '${facebookLink}',
+    SET bio = $1,
+    phone = $2,
+    name = $3,
+    website = $4,
+    gender = $5,
+    current_salary = $6,
+    expected_salary = $7,
+    age = $8,
+    experience = $9,
+    linkedin_link = $10,
+    github_link = $11,
+    twitter_link = $12,
+    facebook_link = $13
     updated_at = '${new Date().toISOString()}'
-    WHERE id = ${user_id}
-    RETURNING * ;`
+    WHERE id = $14
+    RETURNING * ;`,
+    [
+      bio,
+      phone,
+      name,
+      website,
+      gender,
+      currentSalary,
+      expectedSalary,
+      Number(age),
+      experience,
+      linkedinLink,
+      githubLink,
+      twitterLink,
+      facebookLink,
+      user_id,
+    ]
   );
 
   res.status(200).json({
@@ -130,13 +148,15 @@ exports.getUser = catchAsync(async (req, res, next) => {
   const user_id = req.params.id;
 
   const { rows: userRows } = await pool.query(
-    `SELECT * FROM users WHERE id = ${user_id} ;`
+    `SELECT * FROM users WHERE id = $1 ;`,
+    [user_id]
   );
 
   let user = userRows[0];
 
   const { rows: resumeRows } = await pool.query(
-    `SELECT * FROM resume WHERE user_id = ${user.id} ;`
+    `SELECT * FROM resume WHERE user_id = $1 ;`,
+    [user.id]
   );
 
   if (resumeRows.length) {
@@ -168,10 +188,11 @@ exports.changeProfilePic = catchAsync(async (req, res, next) => {
 
   const { rows: updatedUserRows } = await pool.query(
     `UPDATE users 
-    SET avatar = '${req.file.filename}',  
+    SET avatar = $1,  
     updated_at = '${new Date().toISOString()}'
-    WHERE id = ${user_id}
-    RETURNING * ;`
+    WHERE id = $2
+    RETURNING * ;`,
+    [req.file.filename, user_id]
   );
 
   res.status(200).json({

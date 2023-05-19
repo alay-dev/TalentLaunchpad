@@ -52,9 +52,9 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Please provide a email and a password", 400));
   }
   //2) cheack if the user exists && password is correct
-  const { rows } = await pool.query(
-    `SELECT * FROM users WHERE email = '${email}' ;`
-  );
+  const { rows } = await pool.query(`SELECT * FROM users WHERE email = $1 ;`, [
+    email,
+  ]);
 
   if (!rows.length) {
     return next(new AppError("User doesn't exist. Try signup.", 404));
@@ -68,7 +68,8 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const { rows: companyRows } = await pool.query(
-    `SELECT * FROM company WHERE user_id = ${user.id} ;`
+    `SELECT * FROM company WHERE user_id = $1 ;`,
+    [user_id]
   );
 
   if (companyRows.length) {
@@ -91,7 +92,8 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.signup = catchAsync(async (req, res) => {
   const { name, email, password, user_type } = req.body;
   const { rows: existingUsers } = await pool.query(
-    `SELECT * FROM users WHERE email = '${email}' ;`
+    `SELECT * FROM users WHERE email = $1 ;`,
+    [email]
   );
 
   if (existingUsers.length) {
@@ -102,10 +104,12 @@ exports.signup = catchAsync(async (req, res) => {
 
   const passwordHash = await generatePasswordHash(password);
 
-  const { rows: newUser } = await pool.query(`
+  const { rows: newUser } = await pool.query(
+    `
   INSERT INTO users (name, email,password, user_type ) 
-  VALUES('${name}', '${email}', '${passwordHash}', '${user_type}' ) RETURNING *; 
-  `);
+  VALUES($1, $2, $3, $4 ) RETURNING *;`,
+    [name, email, passwordHash, user_type]
+  );
 
   createSendToken(newUser[0], 201, res, "Signup sucessful");
 });
@@ -134,7 +138,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //3) check if the user exists
   const { rows: currentUser } = await pool.query(
-    `SELECT * FROM users WHERE id = '${decoded.id}' ;`
+    `SELECT * FROM users WHERE id = $1 ;`,
+    [decoded.id]
   );
   if (!currentUser[0]) {
     return next(new AppError("The user no longer exist", 401));
@@ -165,10 +170,11 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   const { rows: updatedUserRows } = await pool.query(
     `UPDATE users 
-    SET password = '${passwordHash}',  
+    SET password = $1,  
     updated_at = '${new Date().toISOString()}'
-    WHERE id = ${user_id}
-    RETURNING * ;`
+    WHERE id = $2
+    RETURNING * ;`,
+    [passwordHash, user_id]
   );
 
   //4) log the user in send jwt
