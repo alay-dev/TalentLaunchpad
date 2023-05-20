@@ -48,6 +48,8 @@ exports.createJob = catchAsync(async (req, res, next) => {
     skillsRequired,
     applyLink,
     industry,
+    remote,
+    urgent,
   } = req.body;
   const user_id = req.user.id;
 
@@ -66,9 +68,11 @@ exports.createJob = catchAsync(async (req, res, next) => {
       employee_resume,
       experience_required,
       qualification_required,
-      industry ) 
+      industry,
+      remote,
+      urgent ) 
     VALUES(
-      $1, $2, $3, $4, $5, $6, $7, $8,  $9, '', $10, $11, $12
+      $1, $2, $3, $4, $5, $6, $7, $8,  $9, '', $10, $11, $12, $13, $14
       ) RETURNING *;`,
     [
       user_id,
@@ -83,6 +87,8 @@ exports.createJob = catchAsync(async (req, res, next) => {
       experienceRequired,
       qualificationRequired,
       industry,
+      remote,
+      urgent,
     ]
   );
 
@@ -107,6 +113,8 @@ exports.updateJob = catchAsync(async (req, res, next) => {
     skillsRequired,
     applyLink,
     industry,
+    remote,
+    urgent,
   } = req.body;
   const user_id = req.user.id;
 
@@ -126,8 +134,10 @@ exports.updateJob = catchAsync(async (req, res, next) => {
       experience_required = $8,
       qualification_required = $9,
       industry = $10,
+      remote = $11,
+      urgent = $12,
       updated_at = '${new Date().toISOString()}' 
-      WHERE id = $11
+      WHERE id = $13
     RETURNING *; `,
     [
       jobType,
@@ -140,6 +150,8 @@ exports.updateJob = catchAsync(async (req, res, next) => {
       experienceRequired,
       qualificationRequired,
       industry,
+      remote,
+      urgent,
       jobId,
     ]
   );
@@ -249,7 +261,7 @@ exports.getAppliedJobs = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
   const { rows: jobRows } = await pool.query(
-    `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+    `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs_applied
     JOIN jobs ON jobs_applied.job_id = jobs.id
     FULL JOIN company ON jobs.company_id = company.id
@@ -276,7 +288,7 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
 
   if (searchTerm && jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+      `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
     JOIN company ON jobs.company_id = company.id
     WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
@@ -287,7 +299,7 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (searchTerm && !jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+      `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
     JOIN company ON jobs.company_id = company.id
     WHERE LOWER(job_title) LIKE LOWER('%${searchTerm}%')
@@ -297,7 +309,7 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (!searchTerm && jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+      `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
     JOIN company ON jobs.company_id = company.id
     WHERE job_type LIKE ANY(ARRAY[${jobTypeArray}])
@@ -307,7 +319,7 @@ exports.getJobsByFilter = catchAsync(async (req, res, next) => {
     jobs = jobRows;
   } else if (!searchTerm && !jobType.length) {
     const { rows: jobRows } = await pool.query(
-      `SELECT jobs.id AS id, apply_link, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+      `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
     FROM jobs
     JOIN company ON jobs.company_id = company.id
     `

@@ -53,11 +53,20 @@ const JobDetail = ({ job, company }: Props) => {
         setNotLoggedInSnackbar(false);
     };
 
+    const get_color = () => {
+        var letters = 'BCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * letters.length)];
+        }
+        return color;
+    }
+
     return (
         <>
             <Header />
             <div className="min-h-screen pt-[var(--header-height)] ">
-                <div className='bg-gradient-to-br from-violet-50 from-50% to-blue-300 px-10 py-20 flex items-center justify-between shadow-sm' >
+                <div style={{ backgroundImage: `linear-gradient(to bottom right, ${get_color()} 50%, ${get_color()})` }} className={` px-10 py-20 flex items-center justify-between shadow-sm`} >
                     <div className='  flex items-start justify-between gap-6'>
                         <Image alt="company logo" width={100} height={100} src={`${UNIVERSAL.BASEURL}/company/${company?.company_logo}`} />
                         <div >
@@ -84,12 +93,14 @@ const JobDetail = ({ job, company }: Props) => {
                                 <div className='py-1 px-4 bg-blue-100 text-blue-600 rounded-2xl'>
                                     <p className='text-sm' >{job.job_type}</p>
                                 </div>
-                                <div className='py-1 px-4 bg-orange-100 text-orange-600 rounded-2xl'>
-                                    <p className='text-sm' >Urgent</p>
-                                </div>
-                                <div className='py-1 px-4 bg-green-100 text-green-600 rounded-2xl'>
-                                    <p className='text-sm' >Remote</p>
-                                </div>
+                                {job.urgent &&
+                                    <div className='py-1 px-4 bg-orange-100 text-orange-600 rounded-2xl'>
+                                        <p className='text-sm' >Urgent</p>
+                                    </div>}
+                                {job.remote &&
+                                    <div className='py-1 px-4 bg-green-100 text-green-600 rounded-2xl'>
+                                        <p className='text-sm' >Remote</p>
+                                    </div>}
                             </div>
                         </div>
 
@@ -217,7 +228,7 @@ const JobDetail = ({ job, company }: Props) => {
 
                     </div>
                 </div>
-            </div>
+            </div >
             <Modal open={applyModal} onClose={() => setApplyModal(false)} >
                 <div className=" w-4/12 flex flex-col bg-white p-8 rounded-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 outline-none " >
                     <form onSubmit={handleSubmit(handle_apply_job)} >

@@ -69,7 +69,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const { rows: companyRows } = await pool.query(
     `SELECT * FROM company WHERE user_id = $1 ;`,
-    [user_id]
+    [user.id]
   );
 
   if (companyRows.length) {

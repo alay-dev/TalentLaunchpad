@@ -10,6 +10,7 @@ import { updateJobDetail } from '@/slices/job/jobSlice';
 import { useRouter } from 'next/router';
 import { Job } from '@/entity/jobs';
 import dynamic from "next/dynamic";
+import { Switch } from '@mui/material';
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const EditJob = (props: Props) => {
@@ -17,6 +18,8 @@ const EditJob = (props: Props) => {
     const [skills, setSkills] = useState<string[]>([]);
     const [skillTmp, setSkillTmp] = useState("");
     const [entertingSkills, setEnterSkills] = useState(false)
+    const [isRemote, setIsRemote] = useState(false)
+    const [isUrgent, setIsUrgent] = useState(false)
 
     const router = useRouter()
 
@@ -38,7 +41,6 @@ const EditJob = (props: Props) => {
     const remove_skill = (item: string) => {
         const tmp = skills.filter(skill => skill !== item);
         setSkills(tmp);
-
         update_skills(tmp.toString());
     }
 
@@ -53,6 +55,8 @@ const EditJob = (props: Props) => {
             skillsRequired: skills.toString(),
             jobId: props.job.id,
             description: jobDescription,
+            remote: isRemote,
+            urgent: isUrgent,
             token: auth.token
         })).unwrap()
             .then(() => router.push("/manage_jobs"))
@@ -73,6 +77,11 @@ const EditJob = (props: Props) => {
         setSkills(props.job.skills_required.split(","))
     }, [props.job])
 
+    useEffect(() => {
+        setIsRemote(props.job.remote)
+        setIsUrgent(props?.job?.urgent)
+    }, [props.job])
+
     return (
         <DashboardLayout>
             <div className="w-full">
@@ -87,6 +96,16 @@ const EditJob = (props: Props) => {
                             <div className="flex flex-col w-full">
                                 <label className="mb-1 font-medium" htmlFor="applyLink">Apply Link</label>
                                 <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("applyLink")} id="applyLink" placeholder="Apply Link" type="text" />
+                            </div>
+                        </div>
+                        <div className="flex gap-2 w-full mb-5">
+                            <div className='flex gap-1 items-center' >
+                                <Switch checked={isRemote} onChange={(e) => setIsRemote(!isRemote)} />
+                                <p>Remote</p>
+                            </div>
+                            <div className='flex gap-1 items-center' >
+                                <Switch checked={isUrgent} onChange={(e) => setIsUrgent(!isUrgent)} />
+                                <p>Urgent</p>
                             </div>
                         </div>
                         <div className="flex flex-col w-full mb-5">

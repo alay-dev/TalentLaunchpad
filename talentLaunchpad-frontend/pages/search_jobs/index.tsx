@@ -91,6 +91,8 @@ const SearchJobs = () => {
                                     jobId={job.id}
                                     createdAt={job.created_at}
                                     companyLogo={job.company_logo}
+                                    urgent={job.urgent}
+                                    remote={job.remote}
                                 />
                             </Link>
                         })}

@@ -62,6 +62,8 @@ type AddJobPayload = {
     salary: string,
     skillsRequired: string,
     applyLink: string,
+    remote: boolean,
+    urgent: boolean,
     token: string,
 }
 
@@ -76,6 +78,8 @@ type UpdateJobPayload = {
     salary: string,
     skillsRequired: string,
     applyLink: string,
+    remote: boolean,
+    urgent: boolean,
     token: string,
 }
 

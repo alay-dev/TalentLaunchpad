@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { addJobDetail, getUserJobs } from '@/slices/job/jobSlice';
-import { Alert, AlertColor, Snackbar } from '@mui/material';
+import { Alert, AlertColor, Snackbar, Switch } from '@mui/material';
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const PostNewJob = () => {
@@ -15,6 +15,8 @@ const PostNewJob = () => {
     const [skillTmp, setSkillTmp] = useState("");
     const [postJobMessage, setPostJobMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
     const [entertingSkills, setEnterSkills] = useState(false)
+    const [isRemote, setIsRemote] = useState(false)
+    const [isUrgent, setIsUrgent] = useState(false)
 
     const user = useAppSelector((state) => state.user)
     const auth = useAppSelector(state => state.authentication.data)
@@ -50,6 +52,8 @@ const PostNewJob = () => {
             skillsRequired: skills.toString(),
             companyId: user.data.company_id,
             description: jobDescription,
+            remote: isRemote,
+            urgent: isUrgent,
             token: auth.token
         })).unwrap()
             .then(() => { dispatch(getUserJobs({ token: auth.token })); setPostJobMessage({ severity: "success", message: "New job successfully posted" }) })
@@ -85,6 +89,16 @@ const PostNewJob = () => {
                                 <div className="flex flex-col w-full">
                                     <label className="mb-1 font-medium" htmlFor="applyLink">Apply Link</label>
                                     <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("applyLink")} id="applyLink" placeholder="Apply Link" type="text" />
+                                </div>
+                            </div>
+                            <div className="flex  w-full gap-5 mb-5">
+                                <div className='flex gap-1 items-center' >
+                                    <Switch checked={isRemote} onChange={(e) => setIsRemote(!isRemote)} />
+                                    <p>Remote</p>
+                                </div>
+                                <div className='flex gap-1 items-center' >
+                                    <Switch checked={isUrgent} onChange={(e) => setIsUrgent(!isUrgent)} />
+                                    <p>Urgent</p>
                                 </div>
                             </div>
                             <div className="flex flex-col w-full mb-5">

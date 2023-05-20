@@ -15,5 +15,7 @@ export type Job = {
     experience_required: string,
     qualification_required: string,
     industry: string,
-    company_logo: string
+    company_logo: string,
+    remote: boolean,
+    urgent: boolean
 }

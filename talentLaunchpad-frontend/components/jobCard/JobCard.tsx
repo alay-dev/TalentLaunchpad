@@ -13,11 +13,13 @@ type Props = {
     location: string,
     salary: string,
     jobType: string,
-    companyLogo: string
+    companyLogo: string,
+    remote: boolean,
+    urgent: boolean,
     createdAt: Date
 }
 
-const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, createdAt, companyLogo }: Props) => {
+const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, urgent, remote, createdAt, companyLogo }: Props) => {
     return (
         <div className='flex items-start gap-5 border p-5 rounded-lg  hover:shadow-xl transition-all cursor-pointer relative' >
             <div className='absolute top-2 right-2'>
@@ -50,9 +52,16 @@ const JobCard = ({ jobId, industry, jobTitle, jobType, location, salary, created
                     <div className='py-1 px-4 bg-blue-100 text-blue-600 rounded-2xl'>
                         <p className='text-sm' >{jobType}</p>
                     </div>
-                    <div className='py-1 px-4 bg-orange-100 text-orange-600 rounded-2xl'>
-                        <p className='text-sm' >Urgent</p>
-                    </div>
+                    {urgent &&
+                        <div className='py-1 px-4 bg-orange-100 text-orange-600 rounded-2xl'>
+                            <p className='text-sm' >Urgent</p>
+                        </div>
+                    }
+                    {remote &&
+                        <div className='py-1 px-4 bg-green-100 text-green-600 rounded-2xl'>
+                            <p className='text-sm' >Remote</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
