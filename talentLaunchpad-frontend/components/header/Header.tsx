@@ -1,4 +1,4 @@
-import { Alert, Avatar, Checkbox, Drawer, IconButton, Tooltip } from "@mui/material"
+import { Alert, Avatar, Checkbox, Drawer, IconButton, Popover, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 import { RiFacebookFill, RiLogoutCircleRLine } from "react-icons/ri"
 import { CgGoogle } from "react-icons/cg"
@@ -17,6 +17,9 @@ import { Comfortaa } from "next/font/google"
 import { TbTopologyStar } from "react-icons/tb"
 import { CiViewTimeline } from "react-icons/ci"
 import UNIVERSAL from "@/config/config"
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace"
+import { HiOutlineChevronDown } from "react-icons/hi"
+import { IoIosLogOut } from "react-icons/io"
 
 const comfortaa = Comfortaa({
     weight: ["500", "600", "700"],
@@ -30,6 +33,8 @@ const Header = () => {
     const [formType, setFormType] = useState("login");
     const [userType, setUserType] = useState("candidate");
     const [loginMessage, setLoginMessage] = useState("")
+    const [profileMenu, setProfileMenu] = useState(false);
+    const [profileMenuEl, setProfileMenuEl] = useState<Element>()
 
     const dispatch = useAppDispatch();
     const auth = useAppSelector(state => state.authentication)
@@ -91,23 +96,23 @@ const Header = () => {
                     </Link>
                 </div >
                 <div className="flex items-center" >
-                    <ul className="flex gap-1 items-center" >
+                    <ul className="flex gap-2 items-center" >
                         <Link href="/search_jobs">
                             <li className="self-stretch text-gray-600 transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer">Find Jobs</li>
                         </Link>
                         {auth.data.token &&
                             <>
-                                <Link href="/my_profile">
-                                    <li className="self-stretch flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer text-gray-600">
-                                        <Avatar src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} sx={{ width: "2rem", height: "2rem" }} />
-                                        <p>{auth?.data?.user?.name?.split(" ")[0]}</p>
-                                    </li>
-                                </Link>
 
-                                <li className="self-stretch text-gray-600 flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer" onClick={() => handle_logout()}>
+                                <li onClick={(e) => { setProfileMenuEl(e.currentTarget); setProfileMenu(true) }} className="self-stretch flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer text-gray-600">
+                                    <Avatar src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} sx={{ width: "2rem", height: "2rem" }} />
+                                    <HiOutlineChevronDown />
+                                </li>
+
+
+                                {/* <li className="self-stretch text-gray-600 flex gap-1 items-center transition-all duration-75 py-1 px-2 rounded-md hover:bg-slate-200 cursor-pointer" onClick={() => handle_logout()}>
                                     <RiLogoutCircleRLine className="text-lg" />
                                     <p>Logout</p>
-                                </li>
+                                </li> */}
 
                             </>
                         }
@@ -120,7 +125,40 @@ const Header = () => {
                     </ul>
 
                 </div>
-            </div >
+            </div>
+            <Popover
+
+                open={profileMenu}
+                anchorEl={profileMenuEl}
+                onClose={() => setProfileMenu(false)}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+            >
+                <ul className="m-0 p-4 py-6 min-w-max"  >
+                    <li className="flex gap-4 border-b border-gray-200 pb-4 mb-2">
+                        <Image className="rounded-full overflow-hidden" alt="avatar image" width={50} height={50} src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} />
+                        <div>
+                            <h5 className="font-bold">{auth?.data?.user?.name}</h5>
+                            <div className="flex gap-8">
+                                <p className="text-sm">Ready to interview</p>
+                                <p className="text-sm text-blue-600 cursor-pointer">Change</p>
+                            </div>
+                        </div>
+                    </li>
+                    <Link href="/my_profile"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">My Profile</li></Link>
+                    <Link href="/my_resume"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Resume</li></Link>
+                    <Link href="/applied_jobs"><li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Applied jobs</li></Link>
+                    <div className="my-2 w-full h-[1px] bg-gray-200" />
+                    <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Help</li>
+                    <li onClick={() => handle_logout()} className="mt-1 text-red-600 bg-gray-100 flex gap-1 items-center justify-center cursor-pointer text-sm py-2 px-2 rounded-md hover:bg-gray-200">
+                        <IoIosLogOut className="text-lg" />
+                        Log out
+                    </li>
+
+                </ul>
+            </Popover>
             <Drawer
                 anchor="right"
                 open={loginDrawer}
