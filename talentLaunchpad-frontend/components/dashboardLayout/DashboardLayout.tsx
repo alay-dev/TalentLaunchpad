@@ -27,25 +27,15 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
 
 
+
     useEffect(() => {
-        if (sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN")) {
-            dispatch(fetchUserProfile({ token: sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN")! })).unwrap()
-                .then(res => dispatch(setAuth({
-                    token: sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN"),
-                    user: res
-                })))
-        } else {
-            router.push("/")
-        }
+        console.log(router.pathname)
+        if (router.pathname === "/dashboard") setActivePage("dashboard")
+        else if (router.pathname === "/my_profile") setActivePage("myProfile")
+        else if (router.pathname === "/my_resume") setActivePage("myResume")
+    }, [router.pathname])
 
-    }, [])
 
-    // useEffect(() => {
-    //     console.log(router.pathname)
-    //     if (router.pathname === "/dashboard") setActivePage("dashboard")
-    //     else if (router.pathname === "/my_profile") setActivePage("myProfile")
-    //     else if (router.pathname === "/my_resume") setActivePage("myResume")
-    // }, [router.pathname])
 
     return (
         <>

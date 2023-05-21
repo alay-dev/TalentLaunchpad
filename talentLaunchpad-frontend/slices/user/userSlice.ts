@@ -32,6 +32,7 @@ const initialState: InitialState = {
     github_link: "",
     twitter_link: "",
     facebook_link: "",
+    interactivity_status: ""
   },
   loading: true,
   error: '',
@@ -213,6 +214,32 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
+type UpdateInteractivityStatus = {
+  status: string,
+  token: string
+}
+
+export const updateInteractivityStatus = createAsyncThunk(
+  '/user/updateInteractivityStatus',
+  (data: UpdateInteractivityStatus) => {
+    return fetch(`${UNIVERSAL.BASEURL}/api/users/update_interactivity_status`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${data.token}`
+      },
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...data
+      })
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        // localStorage.setItem('ENTERPRISE_DASHBOARD_EMAIL', data.email);
+        return res.data;
+      });
+  }
+);
+
 
 const userSlice = createSlice({
   name: 'user',
@@ -245,6 +272,7 @@ const userSlice = createSlice({
         github_link: "",
         twitter_link: "",
         facebook_link: "",
+        interactivity_status: ""
       }
     }
   },

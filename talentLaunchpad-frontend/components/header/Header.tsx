@@ -1,4 +1,4 @@
-import { Alert, Avatar, Checkbox, Drawer, IconButton, Popover, Tooltip } from "@mui/material"
+import { Alert, Avatar, Checkbox, Drawer, IconButton, Modal, Popover, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 import { RiFacebookFill, RiLogoutCircleRLine } from "react-icons/ri"
 import { CgGoogle } from "react-icons/cg"
@@ -7,10 +7,10 @@ import { FaUserTie } from "react-icons/fa"
 import { IoCloseCircleOutline, IoLogOutOutline } from "react-icons/io5"
 import Link from "next/link"
 import { useAppDispatch } from "@/hooks/useAppDispatch"
-import { emailLogin, logout, signupWithEmail } from "@/slices/authentication/authenticationSlice"
+import { emailLogin, logout, setAuth, signupWithEmail } from "@/slices/authentication/authenticationSlice"
 import { useForm } from "react-hook-form"
 import { useAppSelector } from "@/hooks/useAppSelector"
-import { clearProfile } from "@/slices/user/userSlice"
+import { clearProfile, fetchUserProfile, updateInteractivityStatus } from "@/slices/user/userSlice"
 import { useRouter } from "next/router"
 import Image from "next/image"
 import { Comfortaa } from "next/font/google"
@@ -20,6 +20,9 @@ import UNIVERSAL from "@/config/config"
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace"
 import { HiOutlineChevronDown } from "react-icons/hi"
 import { IoIosLogOut } from "react-icons/io"
+import { BsChatSquareDots, BsCheck2All } from "react-icons/bs"
+import { RxCross2 } from "react-icons/rx"
+import { SlClose } from "react-icons/sl"
 
 const comfortaa = Comfortaa({
     weight: ["500", "600", "700"],
@@ -35,9 +38,11 @@ const Header = () => {
     const [loginMessage, setLoginMessage] = useState("")
     const [profileMenu, setProfileMenu] = useState(false);
     const [profileMenuEl, setProfileMenuEl] = useState<Element>()
+    const [interactivityStatusModal, setInteractivityStatusModal] = useState(false)
 
     const dispatch = useAppDispatch();
     const auth = useAppSelector(state => state.authentication)
+    const user = useAppSelector(state => state.user.data)
 
     const router = useRouter()
 
@@ -58,6 +63,26 @@ const Header = () => {
         }
     })
 
+
+    useEffect(() => {
+        if (!auth?.data?.token && sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN")) {
+            dispatch(fetchUserProfile({ token: sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN")! })).unwrap()
+                .then(res => dispatch(setAuth({
+                    token: sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN"),
+                    user: res
+                })))
+        } else if (!auth?.data?.token && !sessionStorage.getItem("TALENTLAUNCHPAD_TOKEN")) {
+            router.push("/")
+        }
+
+    }, [auth?.data?.token])
+
+    useEffect(() => {
+        if (auth.data.token) {
+            dispatch(fetchUserProfile({ token: auth.data.token }))
+        }
+    }, [auth?.data?.token])
+
     const login = (data: LoginFormData) => {
         dispatch(emailLogin({ email: data.userName, password: data.password })).unwrap()
             .then(() => { setLoginDrawer(false); })
@@ -77,10 +102,21 @@ const Header = () => {
     }
 
     const handle_logout = () => {
+
+        setProfileMenu(false)
         dispatch(logout());
         dispatch(clearProfile());
 
+        sessionStorage.removeItem("TALENTLAUNCHPAD_TOKEN");
         router.push("/")
+    }
+
+    const handle_status_update = (status: string) => {
+        dispatch(updateInteractivityStatus({
+            token: auth.data?.token,
+            status: status
+        })).unwrap()
+            .then(() => { setInteractivityStatusModal(false); dispatch(fetchUserProfile({ token: auth?.data?.token })) })
     }
 
     return (
@@ -135,20 +171,24 @@ const Header = () => {
                     horizontal: 'center',
                 }}
             >
-                <ul className="m-0 p-4 py-6 min-w-max"  >
-                    <li className="flex gap-4 border-b border-gray-200 pb-4 mb-2">
-                        <Image className="rounded-full overflow-hidden" alt="avatar image" width={50} height={50} src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} />
+                <ul className="w-72 m-0 p-4 py-6 min-w-max"  >
+                    <li className="flex items-center gap-4 border-b border-gray-200 pb-4 mb-2">
+                        <Avatar className="rounded-full overflow-hidden" alt={auth?.data?.user?.name} src={`${UNIVERSAL.BASEURL}/profilePic/${auth?.data?.user?.avatar}`} />
                         <div>
                             <h5 className="font-bold">{auth?.data?.user?.name}</h5>
-                            <div className="flex gap-8">
-                                <p className="text-sm">Ready to interview</p>
-                                <p className="text-sm text-blue-600 cursor-pointer">Change</p>
-                            </div>
+                            {user?.user_type === "candidate" &&
+                                <div className="flex gap-8">
+                                    <p className="text-sm">{user?.interactivity_status}</p>
+                                    <p className="text-sm text-blue-600 cursor-pointer" onClick={() => { setInteractivityStatusModal(true); setProfileMenu(false) }} >Change</p>
+                                </div>}
                         </div>
                     </li>
+                    {auth?.data?.user?.user_type === "employer" && <Link href="/company_profile"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Company</li></Link>}
                     <Link href="/my_profile"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">My Profile</li></Link>
-                    <Link href="/my_resume"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Resume</li></Link>
-                    <Link href="/applied_jobs"><li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Applied jobs</li></Link>
+                    {auth?.data?.user?.user_type === "candidate" && <Link href="/my_resume"> <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Resume</li></Link>}
+                    {auth?.data?.user?.user_type === "candidate" && <Link href="/post_new_job"><li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Post a job</li></Link>}
+                    {auth?.data?.user?.user_type === "candidate" && <Link href="/applied_jobs"><li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Applied jobs</li></Link>}
+                    {auth?.data?.user?.user_type === "employer" && <Link href="/manage_jobs"><li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Manage jobs</li></Link>}
                     <div className="my-2 w-full h-[1px] bg-gray-200" />
                     <li className="cursor-pointer text-sm py-1 px-2 rounded-md hover:bg-gray-200">Help</li>
                     <li onClick={() => handle_logout()} className="mt-1 text-red-600 bg-gray-100 flex gap-1 items-center justify-center cursor-pointer text-sm py-2 px-2 rounded-md hover:bg-gray-200">
@@ -255,6 +295,34 @@ const Header = () => {
                     }
                 </div>
             </Drawer >
+            <Modal open={interactivityStatusModal} onClose={() => setInteractivityStatusModal(false)} >
+                <div className=" w-4/12 flex flex-col  bg-white p-8 rounded-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 outline-none " >
+                    <h3 className="font-medium text-xl mb-5" >Select your status</h3>
+                    <ul>
+                        <li onClick={() => handle_status_update("Ready to interview")} className="flex gap-4 mb-3 hover:bg-gray-100 rounded-md p-1 cursor-pointer ">
+                            <BsChatSquareDots className="text-5xl text-green-500" />
+                            <div>
+                                <h5 className="font-medium" >Ready to interview</h5>
+                                <p className="leading-5 text-gray-500">You’re actively looking for new work and ready to interview. Your job profile will be visible to startups.</p>
+                            </div>
+                        </li>
+                        <li onClick={() => handle_status_update("Open to offers")} className=" flex gap-4 mb-3 hover:bg-gray-100 rounded-md p-1 cursor-pointer ">
+                            <BsCheck2All className="text-5xl text-blue-500" />
+                            <div>
+                                <h5 className="font-medium">Open to offers</h5>
+                                <p className="leading-5 text-gray-500">You’re not looking but open to hear about new opportunities. Your job profile will be visible to startups.</p>
+                            </div>
+                        </li>
+                        <li onClick={() => handle_status_update("Closed to offers")} className="flex gap-4 hover:bg-gray-100 rounded-md p-1 cursor-pointer" >
+                            <SlClose className="text-5xl text-red-500" />
+                            <div>
+                                <h5 className="font-medium">Closed to offers</h5>
+                                <p className="leading-5 text-gray-500">You’re not looking and don’t want to hear about new opportunities. Your job profile will be hidden to startups.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </Modal>
         </>
     )
 }

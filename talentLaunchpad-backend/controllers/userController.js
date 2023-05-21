@@ -202,3 +202,27 @@ exports.changeProfilePic = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.updateInteractivityStatus = catchAsync(async (req, res, next) => {
+  const user_id = req.user.id;
+
+  const { status } = req.body;
+
+  const { rows: updatedUserRows } = await pool.query(
+    `UPDATE users 
+    SET interactivity_status = $1,  
+    updated_at = '${new Date().toISOString()}'
+    WHERE id = $2
+    RETURNING * ;`,
+    [status, user_id]
+  );
+
+  console.log(updatedUserRows[0]);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      ...updatedUserRows[0],
+    },
+  });
+});

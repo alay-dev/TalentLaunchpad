@@ -21,4 +21,5 @@ export type User = {
     github_link: string,
     twitter_link: string,
     facebook_link: string,
+    interactivity_status: string
 }

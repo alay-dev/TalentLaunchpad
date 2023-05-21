@@ -30,4 +30,10 @@ router.patch(
   userController.changeProfilePic
 );
 
+router.patch(
+  "/update_interactivity_status",
+  authController.protect,
+  userController.updateInteractivityStatus
+);
+
 module.exports = router;
