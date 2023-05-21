@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { addJobDetail, getUserJobs } from '@/slices/job/jobSlice';
-import { Alert, AlertColor, Snackbar, Switch } from '@mui/material';
+import { Alert, AlertColor, Popover, Snackbar, Switch } from '@mui/material';
+import LocationSearch from '@/components/locationSearch/LocationSearch';
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const PostNewJob = () => {
@@ -17,6 +18,7 @@ const PostNewJob = () => {
     const [entertingSkills, setEnterSkills] = useState(false)
     const [isRemote, setIsRemote] = useState(false)
     const [isUrgent, setIsUrgent] = useState(false)
+    const [location, setLocation] = useState("");
 
     const user = useAppSelector((state) => state.user)
     const auth = useAppSelector(state => state.authentication.data)
@@ -53,6 +55,7 @@ const PostNewJob = () => {
             companyId: user.data.company_id,
             description: jobDescription,
             remote: isRemote,
+            location: location,
             urgent: isUrgent,
             token: auth.token
         })).unwrap()
@@ -67,6 +70,12 @@ const PostNewJob = () => {
 
         setPostJobMessage({ severity: "", message: "" });
     };
+
+
+    const [selectedProfile, setSelectedProfile] = useState<{
+        id: string;
+        name: string;
+    }>();
 
 
     return (
@@ -130,12 +139,13 @@ const PostNewJob = () => {
                                 </div>
                                 <div className="flex flex-col w-1/2">
                                     <label className="mb-1 font-medium" htmlFor="location">Location</label>
-                                    <select className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("location")} id="location" >
-                                        <option value="Bangalore" >Bangalore</option>
-                                        <option value="Chennai" >Chennai</option>
-                                        <option value="Delhi" >Delhi</option>
-                                        <option value="Remote" >Remote</option>
-                                    </select>
+                                    <LocationSearch
+                                        value={location}
+                                        renderItem={(item) => <p>{item}</p>}
+                                        onSelect={(item) => setLocation(item)}
+                                    />
+
+
                                 </div>
                             </div>
 
@@ -202,7 +212,7 @@ type PostJobFormData = {
     industry: string,
     qualificationRequired: string,
     experienceRequired: string
-    location: string,
+    // location: string,
     salary: string,
     applyLink: string,
     // skillInput: string

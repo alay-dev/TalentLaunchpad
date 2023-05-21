@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { Alert, AlertColor, Modal, Snackbar } from "@mui/material";
 import UNIVERSAL from "@/config/config";
 import dynamic from "next/dynamic";
+import LocationSearch from "@/components/locationSearch/LocationSearch";
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const CompanyProfile = () => {
@@ -17,6 +18,7 @@ const CompanyProfile = () => {
     const [changeLogoModal, setChangeLogoModal] = useState(false)
     const [logoTmp, setLogoTmp] = useState<any>(null)
     const [updateCompanyMessage, setUpdateCompanyMessage] = useState<{ severity: string, message: string }>({ severity: "", message: "" })
+    const [completeAddress, setCompleteAddress] = useState("");
 
     const user = useAppSelector(state => state.user)
     const auth = useAppSelector(state => state.authentication.data)
@@ -30,6 +32,7 @@ const CompanyProfile = () => {
             dispatch(updateCompanyDetail({
                 ...data,
                 aboutCompany: companyDescription,
+                completeAddress: completeAddress,
                 token: auth.token
             })).unwrap()
                 .then(() => {
@@ -43,6 +46,7 @@ const CompanyProfile = () => {
             dispatch(addCompanyDetail({
                 ...data,
                 aboutCompany: companyDescription,
+                completeAddress: completeAddress,
                 token: auth.token
             })).unwrap()
                 .then(() => dispatch(getUserCompany({
@@ -71,9 +75,11 @@ const CompanyProfile = () => {
                 twitterLink: company.data.twitter_link,
                 country: company.data.location?.split(", ")[1],
                 city: company.data.location?.split(", ")[0],
-                completeAddress: company.data.complete_address,
+                // completeAddress: company.data.complete_address,
                 primaryIndustry: company.data.primary_industry
             })
+
+            setCompleteAddress(company?.data?.complete_address)
         }
     }, [company.data.id])
 
@@ -205,7 +211,12 @@ const CompanyProfile = () => {
                         <div className="flex gap-5 mb-5 mt-4">
                             <div className="flex flex-col w-full">
                                 <label className="mb-1 font-medium" htmlFor="completeAddress">Complete address</label>
-                                <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("completeAddress")} id="completeAddress" placeholder="Complete address" type="text" />
+                                {/* <input className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("completeAddress")} id="completeAddress" placeholder="Complete address" type="text" /> */}
+                                <LocationSearch
+                                    value={completeAddress}
+                                    renderItem={(item) => <p>{item}</p>}
+                                    onSelect={(item) => setCompleteAddress(item)}
+                                />
                             </div>
                         </div>
                         <button type="submit" className="bg-blue-500 text-white rounded-md py-3 mt-5 hover:shadow-md transition duration-200 hover:bg-blue-600 w-60" >{company.data.id ? "Update" : "Save"}</button>
@@ -249,6 +260,6 @@ type AddCompanyFormData = {
     facebookLink: string,
     country: string,
     city: string,
-    completeAddress: string,
+    // completeAddress: string,
     primaryIndustry: string
 }

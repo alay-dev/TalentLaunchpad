@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { Job } from '@/entity/jobs';
 import dynamic from "next/dynamic";
 import { Switch } from '@mui/material';
+import LocationSearch from '@/components/locationSearch/LocationSearch';
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
 
 const EditJob = (props: Props) => {
@@ -20,6 +21,7 @@ const EditJob = (props: Props) => {
     const [entertingSkills, setEnterSkills] = useState(false)
     const [isRemote, setIsRemote] = useState(false)
     const [isUrgent, setIsUrgent] = useState(false)
+    const [location, setLocation] = useState("");
 
     const router = useRouter()
 
@@ -57,6 +59,7 @@ const EditJob = (props: Props) => {
             description: jobDescription,
             remote: isRemote,
             urgent: isUrgent,
+            location: location,
             token: auth.token
         })).unwrap()
             .then(() => router.push("/manage_jobs"))
@@ -68,13 +71,14 @@ const EditJob = (props: Props) => {
             applyLink: props.job.apply_link,
             experienceRequired: props.job.experience_required,
             jobType: props.job.job_type,
-            location: props.job.location,
             qualificationRequired: props.job.qualification_required,
             salary: props.job.salary,
-            industry: props.job.industry
+            industry: props.job.industry,
+
         })
 
         setSkills(props.job.skills_required.split(","))
+        setLocation(props?.job?.location)
     }, [props.job])
 
     useEffect(() => {
@@ -138,13 +142,11 @@ const EditJob = (props: Props) => {
                             </div>
                             <div className="flex flex-col w-1/2">
                                 <label className="mb-1 font-medium" htmlFor="location">Location</label>
-                                <select className="focus:bg-white focus:border border-blue-600 transition duration-200  outline-none bg-gray-100 py-3 px-2  rounded-md" {...register("location")} id="location" >
-                                    <option value="Bangalore" >Bangalore</option>
-                                    <option value="Chennai" >Chennai</option>
-                                    <option value="Delhi" >Delhi</option>
-                                    <option value="Remote" >Remote</option>
-
-                                </select>
+                                <LocationSearch
+                                    value={location}
+                                    renderItem={(item) => <p>{item}</p>}
+                                    onSelect={(item) => setLocation(item)}
+                                />
                             </div>
                         </div>
 
@@ -221,7 +223,6 @@ type UpdateJobFormData = {
     jobType: string,
     qualificationRequired: string,
     experienceRequired: string
-    location: string,
     salary: string,
     applyLink: string,
     industry: string

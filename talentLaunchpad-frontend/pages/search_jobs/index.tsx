@@ -86,7 +86,7 @@ const SearchJobs = () => {
                                     industry={job.industry}
                                     jobTitle={job.job_title}
                                     jobType={job.job_type}
-                                    location={job.location}
+                                    location={job.location.split(",")[0]}
                                     salary={job.salary}
                                     jobId={job.id}
                                     createdAt={job.created_at}

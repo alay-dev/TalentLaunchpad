@@ -127,7 +127,6 @@ const Header = () => {
                 </div>
             </div>
             <Popover
-
                 open={profileMenu}
                 anchorEl={profileMenuEl}
                 onClose={() => setProfileMenu(false)}

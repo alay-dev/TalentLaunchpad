@@ -78,7 +78,7 @@ const JobDetail = ({ job, company }: Props) => {
                                 </div>
                                 <div className='flex gap-2 items-center'>
                                     <CiLocationOn />
-                                    <p className='font-light' >{job.location}</p>
+                                    <p className='font-light' >{job.location.split(",")[0]}</p>
                                 </div>
                                 <div className='flex gap-2 items-center'>
                                     <CiTimer />

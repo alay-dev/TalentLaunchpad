@@ -189,7 +189,7 @@ exports.updateCompany = catchAsync(async (req, res, next) => {
     facebook_link = $8,  
     twitter_link = $9, 
     google_plus_link = $10, 
-    linkedin_link = $11 
+    linkedin_link = $11,
     website = $12,
     complete_address = $13,
     primary_industry  = $14,
