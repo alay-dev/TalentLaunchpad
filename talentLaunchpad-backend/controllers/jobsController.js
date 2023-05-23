@@ -226,7 +226,7 @@ exports.getAllJobs = catchAsync(async (req, res, next) => {
 });
 
 exports.applyJob = catchAsync(async (req, res, next) => {
-  const { jobId, message, resme } = req.body;
+  const { companyId, jobId, message, resme } = req.body;
   const user_id = req.user.id;
 
   console.log("APPLYING FOR JOB");
@@ -249,6 +249,23 @@ exports.applyJob = catchAsync(async (req, res, next) => {
     [user_id, jobId, message]
   );
 
+  await pool.query(
+    `    
+    INSERT INTO messages ( 
+      from_user, 
+      to_company,
+      message,
+      job_id
+      ) 
+    VALUES(
+      $1, 
+      $2,
+      $3,
+      $4
+      ) RETURNING *; `,
+    [user_id, companyId, message, jobId]
+  );
+
   res.status(201).json({
     status: "success",
     data: {
@@ -261,7 +278,7 @@ exports.getAppliedJobs = catchAsync(async (req, res, next) => {
   const user_id = req.user.id;
 
   const { rows: jobRows } = await pool.query(
-    `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id 
+    `SELECT jobs.id AS id, apply_link, remote, urgent, jobs.created_at AS created_at, jobs.description AS description, employee_resume, experience_required, jobs.industry AS industry, job_title, job_type, jobs.location AS location, qualification_required, salary, skills_required, jobs.updated_at AS updated_at, jobs.user_id AS user_id, company_logo, jobs.company_id as company_id, company_name
     FROM jobs_applied
     JOIN jobs ON jobs_applied.job_id = jobs.id
     FULL JOIN company ON jobs.company_id = company.id

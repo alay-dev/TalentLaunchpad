@@ -33,6 +33,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         if (router.pathname === "/dashboard") setActivePage("dashboard")
         else if (router.pathname === "/my_profile") setActivePage("myProfile")
         else if (router.pathname === "/my_resume") setActivePage("myResume")
+        else if (router.pathname === "/messages") setActivePage("messages")
     }, [router.pathname])
 
 
@@ -97,10 +98,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                                 </li>
                             </Link>
                         }
-                        <li onClick={() => setActivePage("messages")} className={` ${router.pathname === "/messages" ? "text-blue-500 bg-gray-100" : ""} hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >
-                            <BiMessageSquareDetail className="text-xl" />
-                            <p>Messages</p>
-                        </li>
+                        <Link href="/messages">
+                            <li onClick={() => setActivePage("messages")} className={` ${router.pathname === "/messages" ? "text-blue-500 bg-gray-100" : ""} hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >
+                                <BiMessageSquareDetail className="text-xl" />
+                                <p>Messages</p>
+                            </li>
+                        </Link>
+
                         <Link href="/change_password">
                             <li onClick={() => setActivePage("changePassword")} className={` ${router.pathname === "/change_password" ? "text-blue-500 bg-gray-100" : ""} hover:bg-gray-100 py-2 px-4 font-light flex gap-4 items-center rounded-md w-full cursor-pointer transition duration-150 `} >
                                 <SlLock className="text-xl" />

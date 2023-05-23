@@ -48,6 +48,7 @@ type AppliedJob = {
     industry: string,
     location: string,
     company_logo: string,
+    company_name: string
 }
 
 type AddJobPayload = {
@@ -238,6 +239,7 @@ export const deleteJob = createAsyncThunk(
 );
 
 type ApplyJobPayload = {
+    companyId: number,
     message: string,
     resume: string,
     jobId: number,

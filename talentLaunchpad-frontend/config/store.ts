@@ -4,6 +4,8 @@ import authenticationReducer from "@/slices/authentication/authenticationSlice"
 import resumeReducer from "@/slices/resume/resumeSlice"
 import companyReducer from "@/slices/company/companySlice"
 import jobReducer from "@/slices/job/jobSlice"
+import messageReducer from "@/slices/message/messageSlice"
+
 
 const store = configureStore({
     reducer: {
@@ -11,7 +13,8 @@ const store = configureStore({
         user: userReducer,
         resume: resumeReducer,
         company: companyReducer,
-        job: jobReducer
+        job: jobReducer,
+        message: messageReducer
     },
 });
 

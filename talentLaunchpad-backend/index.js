@@ -10,6 +10,7 @@ const userRouter = require("./routes/userRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 const globalErrorHandler = require("./controllers/errorController");
 
@@ -52,6 +53,7 @@ app.use("/api/users", userRouter);
 app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/resume", resumeRoutes);
+app.use("/api/message", messageRoutes);
 
 app.use(globalErrorHandler);
 

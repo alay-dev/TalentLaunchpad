@@ -40,6 +40,7 @@ const JobDetail = ({ job, company }: Props) => {
             jobId: job.id,
             message: data.message,
             resume: "",
+            companyId: company.id,
             token: auth.token
         })).unwrap()
             .then(() => setApplyModal(false))
